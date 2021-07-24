@@ -6,6 +6,7 @@ const Handlebars = require('handlebars')
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 
 const homeRoutes = require('./routes/home')
+const tasksRoutes = require('./routes/tasks')
 
 const app = express()
 
@@ -53,6 +54,7 @@ app.use(express.urlencoded({extended: true}))
     2 параметр - переменная с подключенным роутом
  */
 app.use('/', homeRoutes) // регистрируем роут home.js
+app.use('/tasks', tasksRoutes)
 
 const PORT = process.env.PORT || 3000
 
