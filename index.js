@@ -5,10 +5,12 @@ const exphbs = require('express-handlebars')
 const Handlebars = require('handlebars')
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 
+const homeRoutes = require('./routes/home')
+
 const app = express()
 
 const hbs = exphbs.create({
-    defaultLayout: 'main', // шаблон по умолчанию
+    defaultLayout: 'default', // шаблон по умолчанию
     extname: 'hbs', // расширение страниц (views) и шаблонов (layouts) - (по умолчанию .handlebars)
     handlebars: allowInsecurePrototypeAccess(Handlebars) // исправляем ошибку при запросе с MongoDB
 })
@@ -44,6 +46,13 @@ app.use(express.static(path.join(__dirname, 'assets')))
     создаём настроку для корректного получения POST-запрос с формы через Express.js
  */
 app.use(express.urlencoded({extended: true}))
+
+/*
+    регистрируем роуты app.use()
+    1 параметр - префикс (путь)
+    2 параметр - переменная с подключенным роутом
+ */
+app.use('/', homeRoutes) // регистрируем роут home.js
 
 const PORT = process.env.PORT || 3000
 
