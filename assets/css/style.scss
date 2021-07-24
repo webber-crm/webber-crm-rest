@@ -1,0 +1,174 @@
+@import "model";
+@import "switch";
+
+.navbar-logo {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.section-auth {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+}
+
+.payment {
+  &-table {
+    td {
+      position: relative;
+    }
+  }
+
+  &-task {
+    border-bottom: 1px dashed black;
+    cursor: pointer;
+  }
+
+  &-notification {
+    position: absolute;
+    left: 60px;
+    top: 0;
+    z-index: 1;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: .75em;
+  }
+
+  &-label {
+    position: relative;
+  }
+
+  &-id {
+    position: absolute;
+    right: 0;
+  }
+}
+
+.icon {
+
+  &-action {
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    width: 3rem;
+  }
+  &-edit {
+    background-color: #3e8ed0;
+  }
+
+  &-delete {
+    background-color: #f14668;
+  }
+}
+
+.field-body {
+  &-not-last {
+    margin-bottom: .75rem;
+
+    .field {
+      flex-basis: 0;
+    }
+
+    .select, select {
+      width: 100%;
+    }
+  }
+}
+
+.page {
+  &-edit {
+    .select, select {
+      width: 100%;
+    }
+  }
+
+  &-single {
+    &-task {
+      .field {
+        margin-bottom: 1.25rem;
+      }
+    }
+  }
+}
+
+.input-link {
+  position: relative;
+
+  &-item {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+  }
+}
+
+.control-switch {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+
+  &-label {
+    margin-bottom: 0 !important;
+    margin-right: 10px;
+    font-size: 12px;
+  }
+}
+
+.tags {
+  &-container {
+    margin-bottom: 0 !important;
+  }
+
+  &-add-control {
+    width: 100%;
+  }
+}
+
+.box-image {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 40px;
+}
+
+.customer-avatar {
+  &-img {
+    height: 100% !important;
+    width: 100%;
+    object-fit: cover;
+    overflow: hidden;
+  }
+
+  &-upload {
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  &-delete {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}
+
+.tabs-with-content {
+  .tabs:not(:last-child) {
+    margin-bottom: 0;
+  }
+
+  .tab-content {
+    padding: 1rem 0;
+    display: none;
+
+    &.is-active {
+      display: block;
+    }
+  }
+}
