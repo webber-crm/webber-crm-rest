@@ -40,9 +40,11 @@
             </tr>
             </thead>
             <tbody>
+            {{#each tasks}}
+            {{#if active}}
             <tr>
-                <td>1</td>
-                <td>Поменять заголовки</td>
+                <td>{{id}}</td>
+                <td>{{name}}</td>
                 <td>3put</td>
                 <td>
                     <a href="//demo.com" target="_blank">
@@ -52,7 +54,7 @@
                       </span>
                     </a>
                 </td>
-                <td>6,5</td>
+                <td>{{time.estimate}}</td>
                 <td>4 500</td>
                 <!--<td>
                     <span class="tag is-info">Редактировать</span>
@@ -60,7 +62,7 @@
                 </td>-->
                 <td>
                     <span class="icon icon-action icon-edit">
-                        <i class="fas fa-pen"></i>
+                        <a class="fas fa-pen" href="/tasks/{{id}}"></a>
                       </span>
 
                     <span class="icon icon-action icon-delete">
@@ -68,30 +70,8 @@
                       </span>
                 </td>
             </tr>
-            <tr>
-                <td>2</td>
-                <td>Поменять заголовки</td>
-                <td>3put</td>
-                <td>
-                    <a href="//demo.com" target="_blank">
-                        demo.com
-                        <span class="icon">
-                        <i class="fas fa-external-link-alt"></i>
-                      </span>
-                    </a>
-                </td>
-                <td>6,5</td>
-                <td>4 500</td>
-                <td>
-                    <span class="icon icon-action icon-edit">
-                        <i class="fas fa-pen"></i>
-                      </span>
-
-                    <span class="icon icon-action icon-delete">
-                        <i class="fas fa-trash-alt"></i>
-                      </span>
-                </td>
-            </tr>
+            {{/if}}
+            {{/each}}
             </tbody>
         </table>
     </div>
