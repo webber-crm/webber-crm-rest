@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
 const Handlebars = require('handlebars')
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
+const { url } = require('./config')
 
 const homeRoutes = require('./routes/home')
 const tasksRoutes = require('./routes/tasks')
@@ -60,8 +61,6 @@ const PORT = process.env.PORT || 3000
 
 async function start() {
     try {
-        const url = 'mongodb+srv://askold:dVPOU9lNRTFdgmnk@nodeexpress.l1etm.mongodb.net/nodeCRM'
-
         /*
             подключаемся к БД асинхронно, ожидаем успешного подключения с помощью await
 
@@ -69,11 +68,11 @@ async function start() {
             1 параметр - url от MongoDB
             2 параметр - различные опции | useNewUrlParser: true, useUnifiedTopology: true - для лучшей совместимости
          */
-       /* await mongoose.connect(url, {
+        await mongoose.connect(url, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false
-        })*/
+        })
 
         // app.listen() - аналог модуля HTTP, метод http.createServer()
         app.listen(PORT, () => {
