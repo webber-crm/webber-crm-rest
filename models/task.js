@@ -64,4 +64,4 @@ const task = new Schema({
     }
 })
 
-module.exports = model('Task', task) // экспортируем модель, передаём схему course
+module.exports = model('Task', task) // экспортируем модель, передаём схему task
