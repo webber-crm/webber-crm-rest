@@ -19,10 +19,6 @@ const task = new Schema({
             default: 0
         }
     },
-    price: {
-        type: Number,
-        default: 0
-    },
     states: {
         created: {
           type: Date,
