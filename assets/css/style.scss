@@ -49,6 +49,10 @@
 
 .icon {
 
+  & > a {
+    color: #fff;
+  }
+
   &-action {
     border-radius: 5px;
     color: white;

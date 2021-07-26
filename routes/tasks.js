@@ -61,6 +61,11 @@ router.get('/:id', async (req, res) => {
     })
 })
 
+router.get('/:id/delete', async (req, res) => {
+    await Task.findByIdAndRemove(req.params.id)
+    res.redirect('/tasks')
+})
+
 router.post('/add', async (req, res) => {
     const tasks = await Task.find()
 

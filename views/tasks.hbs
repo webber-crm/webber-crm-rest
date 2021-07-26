@@ -43,7 +43,7 @@
             {{#each tasks}}
             {{#if active}}
             <tr>
-                <td>{{id}}</td>
+                <td>{{idx}}</td>
                 <td>{{name}}</td>
                 <td>3put</td>
                 <td>
@@ -63,11 +63,11 @@
                 <td>
                     <span class="icon icon-action icon-edit">
                         <a class="fas fa-pen" href="/tasks/{{id}}"></a>
-                      </span>
+                    </span>
 
                     <span class="icon icon-action icon-delete">
-                        <i class="fas fa-trash-alt"></i>
-                      </span>
+                        <a class="fas fa-trash-alt" href="/tasks/{{id}}/delete"></a>
+                    </span>
                 </td>
             </tr>
             {{/if}}
