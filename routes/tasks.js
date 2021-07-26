@@ -1,5 +1,7 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
 const Task = require('../models/task')
+const User = require('../models/user')
+const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
 
 router.get('/', async (req, res) => {
@@ -8,7 +10,16 @@ router.get('/', async (req, res) => {
         1 параметр - название страницы (без указания расширения .hbs), которая будет подключена
         2 параметр - объект с любыми нужными нам опциями. Например, передадим мета-title
     */
-    const tasks = await Task.find()
+
+    const data = await Task.find().populate('roles.developer')
+
+    const tasks = data.map(t => {
+    if (t.roles.developer) {
+        t.price = t.time.estimate * t.roles.developer.price
+    }
+        return t
+    })
+
     res.render('tasks', {
         title: 'Задачи',
         isTasks: true,
@@ -25,12 +36,7 @@ router.get('/add', (req, res) => {
 router.post('/edit', async (req, res) => {
     const {id} = req.body // забираем id из объекта req.body в переменную
     delete req.body.id // удаляем req.body.id, так как в MongoDB поле называется "_id", а в нашем запросе "id"
-    /*
-        findByIdAndUpdate() - метод Mongoose, ищем по _id и обновляем
-        1 параметр - id
-        2 параметр - объект update (что обновляем)
-     */
-    // await Task.findByIdAndUpdate(id, req.body)
+
     const body = {
         name: req.body.name,
         body: req.body.body,
@@ -62,7 +68,10 @@ router.post('/add', async (req, res) => {
         name: req.body.name,
         body: req.body.body,
         time: {estimate: req.body.estimate, fact: req.body.fact},
-        idx: tasks.length + 1
+        idx: tasks.length + 1,
+        roles: {
+            developer: ObjectId("60fd5b473606a704b64664b3")
+        }
     })
 
     try {

@@ -71,7 +71,8 @@ async function start() {
         await mongoose.connect(url, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            useFindAndModify: false
+            useFindAndModify: false,
+            useCreateIndex: true
         })
 
         // app.listen() - аналог модуля HTTP, метод http.createServer()
