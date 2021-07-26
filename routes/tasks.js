@@ -66,6 +66,16 @@ router.get('/:id/delete', async (req, res) => {
     res.redirect('/tasks')
 })
 
+router.get('/:id/turn-off', async (req, res) => {
+    await Task.findByIdAndUpdate(req.params.id, {active: false})
+    res.redirect('/tasks')
+})
+
+router.get('/:id/turn-on', async (req, res) => {
+    await Task.findByIdAndUpdate(req.params.id, {active: true})
+    res.redirect('/tasks')
+})
+
 router.post('/add', async (req, res) => {
     const tasks = await Task.find()
 

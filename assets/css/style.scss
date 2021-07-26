@@ -60,12 +60,17 @@
     cursor: pointer;
     width: 3rem;
   }
+
   &-edit {
     background-color: #3e8ed0;
   }
 
   &-delete {
     background-color: #f14668;
+  }
+
+  &-disable {
+    background-color: #ffd257;
   }
 }
 

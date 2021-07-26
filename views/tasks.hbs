@@ -41,7 +41,6 @@
             </thead>
             <tbody>
             {{#each tasks}}
-            {{#if active}}
             <tr>
                 <td>{{idx}}</td>
                 <td>{{name}}</td>
@@ -65,12 +64,21 @@
                         <a class="fas fa-pen" href="/tasks/{{id}}"></a>
                     </span>
 
+                {{#if active}}
+                    <span class="icon icon-action icon-disable">
+                        <a class="fas fa-toggle-on" href="/tasks/{{id}}/turn-off"></a>
+                    </span>
+                {{else}}
+                    <span class="icon icon-action icon-disable">
+                        <a class="fas fa-toggle-off" href="/tasks/{{id}}/turn-on"></a>
+                    </span>
+                {{/if}}
+
                     <span class="icon icon-action icon-delete">
                         <a class="fas fa-trash-alt" href="/tasks/{{id}}/delete"></a>
                     </span>
                 </td>
             </tr>
-            {{/if}}
             {{/each}}
             </tbody>
         </table>
