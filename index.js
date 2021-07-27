@@ -1,4 +1,5 @@
 const express = require('express')
+const session = require('express-session')
 const path = require('path')
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
@@ -8,6 +9,7 @@ const { url } = require('./config')
 
 const homeRoutes = require('./routes/home')
 const tasksRoutes = require('./routes/tasks')
+const authRoutes = require('./routes/auth')
 
 const app = express()
 
@@ -50,12 +52,22 @@ app.use(express.static(path.join(__dirname, 'assets')))
 app.use(express.urlencoded({extended: true}))
 
 /*
+    сессии express-session
+ */
+app.use(session({
+    secret: 'studio',
+    saveUninitialized: true,
+    resave: false
+}))
+
+/*
     регистрируем роуты app.use()
     1 параметр - префикс (путь)
     2 параметр - переменная с подключенным роутом
  */
 app.use('/', homeRoutes) // регистрируем роут home.js
 app.use('/tasks', tasksRoutes)
+app.use('/', authRoutes)
 
 const PORT = process.env.PORT || 3000
 
