@@ -56,16 +56,26 @@
             </div>
 
             <div class="navbar-end">
+                {{#if isAuth}}
                 <div class="navbar-item">
                     <div class="buttons">
-                        <a class="button is-primary">
+                        <a class="button is-light" href="/auth/logout">
+                            <strong>Выход</strong>
+                        </a>
+                    </div>
+                </div>
+                {{else}}
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-primary" href="/auth/register">
                             <strong>Регистрация</strong>
                         </a>
-                        <a class="button is-light" href="/auth">
+                        <a class="button is-light" href="/auth/login">
                             Вход
                         </a>
                     </div>
                 </div>
+                {{/if}}
             </div>
         </div>
     </nav>

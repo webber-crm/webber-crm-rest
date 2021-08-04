@@ -3,8 +3,9 @@ const Task = require('../models/task')
 const User = require('../models/user')
 const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
+const auth = require('../middleware/auth')
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     /*
         рендерим шаблон Handlebars:
         1 параметр - название страницы (без указания расширения .hbs), которая будет подключена
@@ -27,13 +28,13 @@ router.get('/', async (req, res) => {
     })
 })
 
-router.get('/add', (req, res) => {
+router.get('/add', auth, (req, res) => {
     res.render('add-task', {
         title: 'Новая задача'
     })
 })
 
-router.post('/edit', async (req, res) => {
+router.post('/edit', auth,async (req, res) => {
     const {id} = req.body // забираем id из объекта req.body в переменную
     delete req.body.id // удаляем req.body.id, так как в MongoDB поле называется "_id", а в нашем запросе "id"
 
@@ -49,7 +50,7 @@ router.post('/edit', async (req, res) => {
     res.redirect('/tasks')
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     /*
         req.params.id - получаем значение /:id
         course - получаем объект с курсом
@@ -61,22 +62,22 @@ router.get('/:id', async (req, res) => {
     })
 })
 
-router.get('/:id/delete', async (req, res) => {
+router.get('/:id/delete', auth, async (req, res) => {
     await Task.findByIdAndRemove(req.params.id)
     res.redirect('/tasks')
 })
 
-router.get('/:id/turn-off', async (req, res) => {
+router.get('/:id/turn-off', auth, async (req, res) => {
     await Task.findByIdAndUpdate(req.params.id, {active: false})
     res.redirect('/tasks')
 })
 
-router.get('/:id/turn-on', async (req, res) => {
+router.get('/:id/turn-on', auth, async (req, res) => {
     await Task.findByIdAndUpdate(req.params.id, {active: true})
     res.redirect('/tasks')
 })
 
-router.post('/add', async (req, res) => {
+router.post('/add', auth, async (req, res) => {
     const tasks = await Task.find()
 
     const task = new Task({

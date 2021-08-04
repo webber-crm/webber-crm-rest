@@ -2,6 +2,7 @@
 
 const {Router} = require('express') // аналог const express.Router = require('express')
 const router = Router()
+const auth = require('../middleware/auth')
 
 /*
     обработка GET-запроса router.get()
@@ -12,7 +13,7 @@ const router = Router()
     по аналогии есть другие метода для обработки разных типов запросов
     например: router.post(), router.put(), router.delete()
 */
-router.get('/', (req, res) => {
+router.get('/', auth, (req, res) => {
     /*
         рендерим шаблон Handlebars:
         1 параметр - название страницы (без указания расширения .hbs), которая будет подключена

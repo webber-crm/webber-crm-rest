@@ -12,7 +12,7 @@ function encrypt(passwd) {
     )
 }
 
-router.get('/auth', async (req, res) => {
+router.get('/login', async (req, res) => {
 
     if (!req.session.user) {
         res.render('auth', {
@@ -24,14 +24,27 @@ router.get('/auth', async (req, res) => {
     }
 })
 
-router.post('/auth', async (req, res) => {
+router.post('/login', async (req, res) => {
+
     const users = await User.findOne({login: req.body.login})
         .then(user => {
             if (req.body.passwd) {
                 const hash = encrypt(req.body.passwd)
                 if (hash === user.passwd) {
-                    req.session.user = user.id
-                    res.redirect('/')
+                    req.session.isAuthorized = true // устанавливаем ключ сессии isAuthenticated = true
+                    req.session.user = user
+
+                    /*
+                       сохраняем сессию, добавляем обработку,
+                       чтобы редирект не выполнился раньше, чем сохранится сессия
+                    */
+                    req.session.save(err => {
+                        if (err) {
+                            throw err
+                        }
+                        res.redirect('/')
+                    })
+
                 } else {
                     console.log('Wrong password')
                     res.redirect('/auth')
@@ -45,6 +58,14 @@ router.post('/auth', async (req, res) => {
             res.redirect('/auth')
             throw Error('User is not exist')
         })
+})
+
+router.get('/logout', async (req, res) => {
+    // очищаем сессию
+    req.session.destroy(() => {
+        // callback-функция может использоваться для удаления сессии из MongoDB
+        res.redirect('/auth/login')
+    })
 })
 
 module.exports = router
