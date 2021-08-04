@@ -47,15 +47,15 @@ router.post('/login', async (req, res) => {
 
                 } else {
                     console.log('Wrong password')
-                    res.redirect('/auth')
+                    res.redirect('/auth/login')
                 }
             } else {
                 console.log('Password is not exist')
-                res.redirect('/auth')
+                res.redirect('/auth/login')
             }
         })
         .catch(err => {
-            res.redirect('/auth')
+            res.redirect('/auth/login')
             throw Error('User is not exist')
         })
 })

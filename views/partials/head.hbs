@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="/css/style.css">
 
+    {{#unless isAuth}}
+        <link rel="stylesheet" href="/css/register.css">
+    {{/unless}}
+
     <!--
         выводим опцию title, которую передали в объекте
         при вызове метода res.render() в index.js

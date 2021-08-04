@@ -1,0 +1,220 @@
+.center {
+  text-align: center;
+}
+
+.ml-0 {
+  margin: 0;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.align-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 45px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f14668;
+  transition: 0.2s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #5cc78e;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.7);
+  outline: none;
+}
+
+input:checked + .slider:before {
+  transform: translateX(21px);
+}
+
+.slider.round {
+  border-radius: 50px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.navbar-logo {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.section-auth {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+}
+
+.payment-table td {
+  position: relative;
+}
+.payment-task {
+  border-bottom: 1px dashed black;
+  cursor: pointer;
+}
+.payment-notification {
+  position: absolute;
+  left: 60px;
+  top: 0;
+  z-index: 1;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  font-size: 0.75em;
+}
+.payment-label {
+  position: relative;
+}
+.payment-id {
+  position: absolute;
+  right: 0;
+}
+
+.icon > a {
+  color: #fff;
+}
+.icon-action {
+  border-radius: 5px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  width: 3rem;
+}
+.icon-edit {
+  background-color: #3e8ed0;
+}
+.icon-delete {
+  background-color: #f14668;
+}
+.icon-disable {
+  background-color: #ffd257;
+}
+
+.field-body-not-last {
+  margin-bottom: 0.75rem;
+}
+.field-body-not-last .field {
+  flex-basis: 0;
+}
+.field-body-not-last .select, .field-body-not-last select {
+  width: 100%;
+}
+
+.page-edit .select, .page-edit select {
+  width: 100%;
+}
+.page-single-task .field {
+  margin-bottom: 1.25rem;
+}
+
+.input-link {
+  position: relative;
+}
+.input-link-item {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+.control-switch {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+.control-switch-label {
+  margin-bottom: 0 !important;
+  margin-right: 10px;
+  font-size: 12px;
+}
+
+.tags-container {
+  margin-bottom: 0 !important;
+}
+.tags-add-control {
+  width: 100%;
+}
+
+.box-image {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 40px;
+}
+
+.customer-avatar-img {
+  height: 100% !important;
+  width: 100%;
+  object-fit: cover;
+  overflow: hidden;
+}
+.customer-avatar-upload {
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.customer-avatar-delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.tabs-with-content .tabs:not(:last-child) {
+  margin-bottom: 0;
+}
+.tabs-with-content .tab-content {
+  padding: 1rem 0;
+  display: none;
+}
+.tabs-with-content .tab-content.is-active {
+  display: block;
+}
+
+/*# sourceMappingURL=style.css.map */
