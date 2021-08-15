@@ -1,5 +1,5 @@
 
-const app = new Vue({
+const pageSingleCustomer = new Vue({
     el: '#page-single-customer',
     data: {
         switcher: false,
@@ -48,4 +48,47 @@ const app = new Vue({
     }
 })
 
-export default { app }
+const pageAuth = new Vue({
+    el: '#auth',
+    data: {
+        name: "",
+        email: "",
+        passwd: "",
+        confirm: "",
+        isEqualPass: true,
+        isValidateEmail: true,
+        isValidateName: true
+    },
+    methods: {
+        validation(bool) {
+            return bool ? "is-success" : "is-danger"
+        }
+    },
+    computed: {
+        passwordCheck() {
+            this.isEqualPass = this.passwd === this.confirm
+
+            if (this.passwd !== "") {
+                return this.isEqualPass ? "is-success" : "is-danger"
+            }
+        },
+        emailCheck() {
+            const regex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+            this.isValidateEmail = regex.test(this.email)
+
+            if (this.email !== "") {
+                return this.isValidateEmail ? "is-success" : "is-danger"
+            }
+        },
+        nameCheck() {
+            const regex = /\D/g
+            this.isValidateName = regex.test(this.name)
+
+            if (this.name !== "") {
+                return this.isValidateName ? "is-success" : "is-danger"
+            }
+        }
+    }
+})
+
+export default { pageSingleCustomer, pageAuth }

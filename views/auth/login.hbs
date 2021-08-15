@@ -1,4 +1,4 @@
-<div class="columns is-multiline">
+<div class="columns is-multiline" id="auth">
     <div class="column is-8 is-offset-2 register">
         <div class="columns">
             <div class="column left align-center">
@@ -13,28 +13,32 @@
                     <div class="field">
                         <label class="label">E-mail</label>
                         <div class="control has-icons-left has-icons-right">
-                            <input class="input is-success is-medium" type="email" placeholder="Text input" name="email">
+                            <input class="input is-medium" :class="emailCheck" type="email" placeholder="Text input" name="email" v-model="email">
                             <span class="icon is-small is-left">
                               <i class="fas fa-user"></i>
                             </span>
-                            <span class="icon is-small is-right">
-                              <i class="fas fa-check"></i>
-                            </span>
+                            <template v-if="email !== ''">
+                                <span class="icon is-small is-right" v-if="isValidateEmail">
+                                  <i class="fas fa-check"></i>
+                                </span>
+                                <span class="icon is-small is-right" v-else>
+                                  <i class="fas fa-exclamation-triangle"></i>
+                                </span>
+                            </template>
                         </div>
                     </div>
 
                     <div class="field">
                         <label class="label">Пароль</label>
                         <div class="control has-icons-left has-icons-right">
-                            <input class="input is-danger is-medium" type="password" placeholder="" name="passwd">
+                            <input class="input is-medium" :class="passwd ? 'is-success' : ''" type="password" placeholder="" name="passwd" v-model="passwd">
                             <span class="icon is-small is-left">
                               <i class="fas fa-key"></i>
                             </span>
-                            <span class="icon is-small is-right">
-                              <i class="fas fa-exclamation-triangle"></i>
+                            <span class="icon is-small is-right" v-if="passwd !== ''">
+                              <i class="fas fa-check"></i>
                             </span>
                         </div>
-                        <p class="help is-danger">Неверный пароль</p>
                     </div>
 
                     <div class="field">
