@@ -86,7 +86,8 @@ router.post('/add', auth, async (req, res) => {
         time: {estimate: req.body.estimate, fact: req.body.fact},
         idx: tasks.length + 1,
         roles: {
-            developer: ObjectId("60fd5b473606a704b64664b3")
+            author: ObjectId(req.session.user._id),
+            developer: ObjectId(req.session.user._id)
         }
     })
 

@@ -13,6 +13,7 @@ const variables = require('./middleware/variables')
 const homeRoutes = require('./routes/home')
 const tasksRoutes = require('./routes/tasks')
 const authRoutes = require('./routes/auth')
+const profileRoutes = require('./routes/profile')
 
 const app = express()
 
@@ -83,6 +84,7 @@ app.use(variables)
 app.use('/', homeRoutes) // регистрируем роут home.js
 app.use('/tasks', tasksRoutes)
 app.use('/auth', authRoutes)
+app.use('/profile', profileRoutes)
 
 const PORT = process.env.PORT || 3000
 

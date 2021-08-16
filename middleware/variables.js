@@ -8,5 +8,6 @@ module.exports = function(req, res, next) {
         которая будет доступна в каждом шаблоне .hbs
     */
     res.locals.isAuth = req.session.isAuthorized
+    res.locals.user = req.session.user
     next()
 }

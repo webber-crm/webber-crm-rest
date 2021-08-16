@@ -14,7 +14,8 @@ const user = new Schema({
             type: String,
             required: true
         },
-        last: String
+        last: String,
+        middle: String
     },
     birthday: Date,
     phone: String,
@@ -23,11 +24,11 @@ const user = new Schema({
     img: String,
     job: {
         type: Schema.Types.ObjectId,
-        ref: 'Role'
+        ref: 'Jobs'
     },
-    permissions: {
+    role: {
         type: Schema.Types.ObjectId,
-        ref: 'Permission'
+        ref: 'Roles'
     }
 })
 

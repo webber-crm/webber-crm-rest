@@ -1,10 +1,10 @@
 const {Schema, model} = require('mongoose') // подключаем класс Schema и функцию model() из mongoose
 
-const perm = new Schema({
+const job = new Schema({
     title: {
         type: String,
         required: true
     }
 })
 
-module.exports = model('Permission', perm)
+module.exports = model('Jobs', job)

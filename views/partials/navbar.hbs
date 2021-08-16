@@ -57,11 +57,25 @@
 
             <div class="navbar-end">
                 {{#if isAuth}}
-                <div class="navbar-item">
-                    <div class="buttons">
-                        <a class="button is-light" href="/auth/logout">
-                            <strong>Выход</strong>
-                        </a>
+                <div class="dropdown is-hoverable is-right">
+                    <div class="dropdown-trigger">
+                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
+                            <span>{{ user.name.first }}</span>
+                            <span class="icon is-small">
+                                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                        </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu3" role="menu">
+                        <div class="dropdown-content">
+                            <a href="/profile" class="dropdown-item">
+                                Настройки
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="/auth/logout" class="dropdown-item">
+                                Выйти
+                            </a>
+                        </div>
                     </div>
                 </div>
                 {{else}}

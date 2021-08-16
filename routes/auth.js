@@ -2,16 +2,7 @@ const {Router} = require('express') // аналог const express.Router = requi
 const User = require('../models/user')
 const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
-const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
-
-function encrypt(passwd) {
-    return (
-        crypto.createHash('sha1')
-            .update(passwd)
-            .digest('hex')
-    )
-}
 
 router.get('/login', async (req, res) => {
 

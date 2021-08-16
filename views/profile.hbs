@@ -1,0 +1,177 @@
+<section class="section page-single-customer" id="page-single-customer">
+
+        <h1 class="title center">Test Test</h1>
+        <div class="subtitle center">Личный кабинет</div>
+
+        <!--
+
+        -->
+
+        <div class="columns is-centered">
+            <div class="column is-6">
+
+            <form method="POST" action="/profile">
+                <div class="box">
+                    <div class="tabs-with-content">
+                        <div class="tabs">
+                            <ul>
+                                <li><a>Общее</a></li>
+                                <li><a>Аккаунт</a></li>
+                                <li><a>Настройки</a></li>
+                                <li><a>Аватар</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <section class="tab-content">
+                                <div class="field-body field-body-not-last">
+                                    <div class="field">
+                                        <label class="label">Имя</label>
+                                        <div class="control">
+                                            <input name="firstname" class="input" type="text" value="{{ user.name.first }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label class="label">Фамилия</label>
+                                        <div class="control">
+                                            <input name="lastname" class="input" type="text" value="{{ user.name.last }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label class="label">Отчество</label>
+                                        <div class="control">
+                                            <input name="middlename" class="input" type="text" value="{{ user.name.middle }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-body field-body-not-last">
+                                    <div class="field">
+                                        <label class="label">Дата рождения</label>
+                                        <div class="field">
+                                            <div class="control w-100">
+                                                <input name="birthday" class="input" type="date" value="{{ birthday }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label class="label">Город</label>
+                                        <div class="field">
+                                            <div class="control w-100">
+                                                <input name="city" class="input" type="text" value="{{ user.city }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-body field-body-not-last">
+                                    <div class="field">
+                                        <label class="label">E-mail</label>
+                                        <div class="field">
+                                            <div class="control w-100">
+                                                <input name="email" class="input" type="email" value="{{ user.email }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label class="label">Телефон</label>
+                                        <div class="field">
+                                            <div class="control w-100">
+                                                <input name="phone" class="input" type="tel" value="{{ user.phone }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="tab-content">
+                                <div class="field-body field-body-not-last">
+                                    <div class="field">
+                                        <label class="label">Должность</label>
+                                        <div class="control">
+                                            <div class="select">
+                                                <select name="job">
+                                                    <option value="{{ user.job._id }}" checked>{{ user.job.title }}</option>
+                                                    {{#if jobs}}
+                                                        {{#each jobs}}
+                                                            <option value="{{ _id }}">{{ title }}</option>
+                                                        {{/each}}
+                                                    {{/if}}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label class="label">Права доступа</label>
+                                        <div class="control">
+                                            <div class="select">
+                                                <select name="role">
+                                                    <option value="{{ user.role._id }}" checked>{{ user.role.title }}</option>
+                                                    {{#if roles}}
+                                                        {{#each roles}}
+                                                            <option value="{{ _id }}">{{ title }}</option>
+                                                        {{/each}}
+                                                    {{/if}}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="label">Стоимость часа</label>
+                                    <div class="field has-addons">
+                                        <p class="control w-100">
+                                            <input name="price" class="input price" type="text" placeholder="1 000" value="{{ user.price }}">
+                                        </p>
+                                        <p class="control">
+                                            <a class="button is-static">
+                                                RUB
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="tab-content">Раздел в разработке.</section>
+                            <section class="tab-content">
+                                <div class="avatar">
+                                    <figure class="image img-object box-image">
+                                        <img class="img-item is-rounded customer-avatar-img" :src="avatarSrc">
+                                        <button class="delete customer-avatar-delete" @click="deleteAvatar($event)" v-if="avatar"></button>
+                                    </figure>
+
+                                    <form action="" v-if="!avatar">
+                                        <div class="file customer-avatar-upload">
+                                            <label class="file-label">
+                                                <input class="file-input" type="file" name="resume" @change="uploadAvatar($event)">
+                                                <span class="file-cta">
+                                                  <span class="file-icon">
+                                                    <i class="fas fa-upload"></i>
+                                                  </span>
+                                                  <span class="file-label">
+                                                    Загрузить картинку
+                                                  </span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </form>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="id" value="{{ user._id }}">
+
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button class="button is-link">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+</section>
