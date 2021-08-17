@@ -8,6 +8,7 @@ const Handlebars = require('handlebars')
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 const { MONGODB_URI } = require('./config')
 
+const fileupload = require('express-fileupload')
 const variables = require('./middleware/variables')
 
 const homeRoutes = require('./routes/home')
@@ -69,6 +70,8 @@ app.use(session({
     resave: false,
     store
 }))
+
+app.use(fileupload())
 
 /*
     регистрируем middleware,

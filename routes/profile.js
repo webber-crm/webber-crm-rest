@@ -5,6 +5,8 @@ const Roles = require('../models/role')
 const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
 const auth = require('../middleware/auth')
+const path = require('path')
+const fs = require('fs')
 
 router.get('/', auth, async (req, res) => {
 
@@ -28,7 +30,7 @@ router.get('/', auth, async (req, res) => {
 
 router.post('/', auth, async (req, res) => {
 
-    const { id } = req.body
+    const id = req.session.user._id
     let data = req.body
 
     data.name = {
@@ -45,7 +47,53 @@ router.post('/', auth, async (req, res) => {
     delete data.lastname
     delete data.middlename
 
-    console.log(data)
+    if (req.files) {
+        if (req.files.img) {
+            delete data.img
+
+            const uploads = path.join(__dirname, '..', 'assets', 'uploads')
+            const images = path.join(__dirname, '..', 'assets', 'uploads', 'images')
+
+            fs.stat(uploads, function(err) {
+                if (err) {
+                    if (err.code === 'ENOENT') {
+                        fs.mkdir(uploads, err => { // путь, callback
+                            if (err) throw new Error(err) // вывод ошибки
+
+                            console.log('Folder "uploads" created')
+                        })
+                    } else {
+                        throw Error(err)
+                    }
+                }
+            });
+
+            fs.stat(images, function(err) {
+                if (err) {
+                    if (err.code === 'ENOENT') {
+                        fs.mkdir(images, err => { // путь, callback
+                            if (err) throw new Error(err) // вывод ошибки
+
+                            console.log('Folder "uploads" created')
+                        })
+                    } else {
+                        throw Error(err)
+                    }
+                }
+            });
+
+            // создание файла fs.writeFile()
+            const img = req.files.img
+            const uploadPath = path.join(images, img.name)
+            const imagePath = path.join('uploads', 'images', img.name)
+
+            await img.mv(uploadPath, function(err) {
+                if (err) throw new Error(err)
+            });
+
+            data.img = imagePath
+        }
+    }
 
     await User.findByIdAndUpdate(id, data)
     res.redirect('/profile')

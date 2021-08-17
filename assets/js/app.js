@@ -45,6 +45,14 @@ const pageSingleCustomer = new Vue({
         domainsJSON() {
             return JSON.stringify(this.domains)
         }
+    },
+    created() {
+        const src = document.getElementById('avatar').dataset.src
+
+        if (src) {
+            this.avatarSrc = src
+            this.avatar = true
+        }
     }
 })
 

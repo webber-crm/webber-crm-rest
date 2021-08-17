@@ -1,5 +1,5 @@
-import "./app.js";
 import { functions as func } from "./functions.js";
+import "./app.js";
 
 document.addEventListener('DOMContentLoaded', () => {
 
