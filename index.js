@@ -2,6 +2,7 @@ const express = require('express')
 const session = require('express-session')
 const MongoStore = require('connect-mongodb-session')(session)
 const path = require('path')
+const csrf = require('csurf')
 const flash = require('connect-flash')
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
@@ -73,14 +74,20 @@ app.use(session({
 }))
 
 /*
- middleware для обработки файлов с POST-формы
+    регистрируем CSRF-защиту
  */
-app.use(fileupload())
+app.use(csrf())
+
 
 /*
     регистрируем Flash - обработка ошибок
  */
 app.use(flash())
+
+/*
+ middleware для обработки файлов с POST-формы
+ */
+app.use(fileupload())
 
 /*
     регистрируем middleware,

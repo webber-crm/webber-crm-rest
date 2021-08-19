@@ -9,5 +9,11 @@ module.exports = function(req, res, next) {
     */
     res.locals.isAuth = req.session.isAuthorized
     res.locals.user = req.session.user
+
+    /*
+        добавляем токен CSRF в объект ответа,
+        чтобы токен был доступен в каждом шаблоне .hbs
+     */
+    res.locals.csrf = req.csrfToken()
     next()
 }
