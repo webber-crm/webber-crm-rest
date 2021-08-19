@@ -9,7 +9,8 @@ router.get('/login', async (req, res) => {
     if (!req.session.user) {
         res.render('auth/login', {
             title: 'Авторизация - Вход',
-            layout: 'main'
+            layout: 'main',
+            error: req.flash('error')
         })
     } else {
         res.redirect('/')
@@ -21,7 +22,8 @@ router.get('/register', async (req, res) => {
     if (!req.session.user) {
         res.render('auth/register', {
             title: 'Регистрация',
-            layout: 'main'
+            layout: 'main',
+            error: req.flash('error')
         })
     } else {
         res.redirect('/')
@@ -51,15 +53,18 @@ router.post('/login', async (req, res) => {
                     })
 
                 } else {
+                    req.flash('error', 'Неверный пароль')
                     console.log('Wrong password')
                     res.redirect('/auth/login')
                 }
             } else {
+                req.flash('error', 'Введите пароль')
                 console.log('Password is not exist')
                 res.redirect('/auth/login')
             }
         })
         .catch(err => {
+            req.flash('error', 'Пользователя с таким email не существует')
             res.redirect('/auth/login')
             throw Error('User is not exist')
         })
@@ -69,14 +74,27 @@ router.post('/register', async (req, res) => {
 
     try {
         const { email, passwd, confirm, name } = req.body
+
+        if (!email) {
+            req.flash('error', 'Укажите email')
+            res.redirect('/auth/register')
+        }
+
         const candidate = await User.findOne({ email }) // email - то же, что и email: email
 
         if (candidate) {
+            req.flash('error', 'Пользователь с таким email уже существует')
             res.redirect('/auth/register')
         } else {
 
             if (passwd !== confirm) {
                 console.log('Passwords aren\'t identical')
+                req.flash('error', 'Пароли не совпадают')
+                res.redirect('/auth/register')
+            }
+
+            if (!name) {
+                req.flash('error', 'Введите имя')
                 res.redirect('/auth/register')
             }
 

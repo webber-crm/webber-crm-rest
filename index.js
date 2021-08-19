@@ -2,6 +2,7 @@ const express = require('express')
 const session = require('express-session')
 const MongoStore = require('connect-mongodb-session')(session)
 const path = require('path')
+const flash = require('connect-flash')
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
 const Handlebars = require('handlebars')
@@ -71,7 +72,15 @@ app.use(session({
     store
 }))
 
+/*
+ middleware для обработки файлов с POST-формы
+ */
 app.use(fileupload())
+
+/*
+    регистрируем Flash - обработка ошибок
+ */
+app.use(flash())
 
 /*
     регистрируем middleware,
