@@ -5,15 +5,9 @@ const customer = new Schema({
         type: String,
         required: true
     },
-    projects: [{
-        domain: {
-            type: Schema.Types.ObjectId,
-            ref: 'Project'
-        }
-    }],
+    projects: [String],
     price: {
-        type: Number,
-        required: true
+        type: Number
     },
     service: {
         type: Schema.Types.ObjectId,
@@ -24,7 +18,11 @@ const customer = new Schema({
         email: String,
         phone: String,
         website: String,
-        contactPerson: String
+        contactPerson: String,
+        dateFrom: {
+            type: Date,
+            default: Date.now()
+        }
     },
     data: {
         inn: Number,
@@ -38,7 +36,8 @@ const customer = new Schema({
             account1: Number,
             account2: Number
         }
-    }
+    },
+    img: String
 })
 
 module.exports = model('Customer', customer)

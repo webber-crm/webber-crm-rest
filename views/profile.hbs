@@ -47,7 +47,7 @@
                                         <label class="label">Дата рождения</label>
                                         <div class="field">
                                             <div class="control w-100">
-                                                <input name="birthday" class="input" type="date" value="{{ birthday }}">
+                                                <input name="birthday" class="input" type="date" value="{{ birthday.en }}">
                                             </div>
                                         </div>
                                     </div>
@@ -105,7 +105,7 @@
                                         <div class="control">
                                             <div class="select">
                                                 <select name="role">
-                                                    <option value="{{ user.role._id }}" checked>{{ user.role.title }}</option>
+                                                    <option value="{{ user.role._id }}" selected>{{ user.role.title }}</option>
                                                     {{#if roles}}
                                                         {{#each roles}}
                                                             <option value="{{ _id }}">{{ title }}</option>

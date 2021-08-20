@@ -2,15 +2,14 @@
 const pageSingleCustomer = new Vue({
     el: '#page-single-customer',
     data: {
+        name: "",
         switcher: false,
         avatar: false,
         avatarDefaultSrc: "https://bulma.io/images/placeholders/128x128.png",
         avatarSrc: "https://bulma.io/images/placeholders/128x128.png",
         tab: null,
         domain: "demo.com",
-        domains: [
-            "demo.com"
-        ]
+        domains: []
     },
     methods: {
         addTag(e) {
@@ -39,6 +38,20 @@ const pageSingleCustomer = new Vue({
         deleteAvatar() {
             this.avatar = false
             this.avatarSrc = this.avatarDefaultSrc
+        },
+        toggleSwitcher() {
+            this.switcher = !this.switcher
+            if (this.domains.length > 0) {
+                if (!this.switcher) {
+                    this.domain = this.domains[0]
+                }
+
+                if (this.switcher) {
+                    if (this.domain === this.domains[0]) {
+                        this.domain = ""
+                    }
+                }
+            }
         }
     },
     computed: {
@@ -47,11 +60,33 @@ const pageSingleCustomer = new Vue({
         }
     },
     created() {
-        const src = document.getElementById('avatar').dataset.src
+        const avatar = document.getElementById('avatar')
+        const projects = document.getElementById('projects-hidden')
+        const name = document.getElementById('name-hidden')
 
-        if (src) {
-            this.avatarSrc = src
-            this.avatar = true
+        if (avatar) {
+            const src = document.getElementById('avatar').dataset.src
+
+            if (src) {
+                this.avatarSrc = src
+                this.avatar = true
+            }
+        }
+
+        if (projects) {
+            const domains = JSON.parse(projects.value)
+
+            if (domains.length === 1) {
+                this.domain = domains[0]
+            } else {
+                this.domains = domains
+                this.switcher = true
+                this.domain = ""
+            }
+        }
+
+        if (name) {
+            this.name = name.value
         }
     }
 })
