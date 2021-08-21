@@ -51,6 +51,11 @@ const pageSingleCustomer = new Vue({
                         this.domain = ""
                     }
                 }
+            }  else {
+                if (this.switcher) {
+                    this.domains[0] = this.domain
+                    this.domain = ""
+                }
             }
         }
     },
