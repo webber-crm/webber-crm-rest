@@ -1,6 +1,6 @@
 
 const pageSingleCustomer = new Vue({
-    el: '#page-single-customer',
+    el: '#page-single',
     data: {
         name: "",
         switcher: false,
