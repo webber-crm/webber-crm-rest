@@ -28,7 +28,7 @@ router.get('/', auth, async (req, res) => {
     })
 })
 
-router.get('/add', auth, (req, res) => {
+router.get('tasks/add', auth, (req, res) => {
     res.render('add-task', {
         title: 'Новая задача'
     })
@@ -56,7 +56,7 @@ router.get('/:id', auth, async (req, res) => {
         course - получаем объект с курсом
      */
     const task = await Task.findById(req.params.id)
-    res.render('edit-task', {
+    res.render('tasks/edit', {
         title: `Задача #${task._id}`, // устанавливаем мета-title
         task // передаём объект курса
     })

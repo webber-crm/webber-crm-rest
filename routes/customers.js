@@ -22,7 +22,7 @@ router.get('/', auth, async (req, res) => {
 router.get('/add', auth, async (req, res) => {
     const services = await Service.find()
 
-    res.render('add-customer', {
+    res.render('customers/add', {
         title: 'Новый клиент',
         services,
         error: req.flash('error')
@@ -76,7 +76,7 @@ router.get('/:id', auth, async (req, res) => {
 
     customer.projects = JSON.stringify(customer.projects)
 
-    res.render('edit-customer', {
+    res.render('customers/edit', {
         title: 'Редактирование карточки клиента',
         customer,
         services,
