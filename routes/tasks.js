@@ -16,10 +16,23 @@ router.get('/', auth, async (req, res) => {
 
     const data = await Task.find().populate('roles.developer')
 
-    const tasks = data.map(t => {
-    if (t.roles.developer) {
-        t.price = t.time.estimate * t.roles.developer.price
-    }
+    const tasks = data.filter(t => {
+        if (t.roles) {
+            // получаем список пользователей внутри roles
+            const users = Object.values(t.roles).map(v => v.toString())
+
+            // если текущий пользователь присутствует в списке пользователей задачи
+            if (users.includes(req.session.user._id.toString())) {
+                return t
+            }
+        }
+    }).map(t => {
+        // если определён разработчик по задаче
+        if (t.roles.developer && t.roles.developer.price) {
+            // рассчитываем стоимость выполнения задачи
+            t.price = t.time.estimate * t.roles.developer.price
+        }
+
         return t
     })
 
@@ -63,12 +76,39 @@ router.get('/:id', auth, async (req, res) => {
         req.params.id - получаем значение /:id
         course - получаем объект с курсом
      */
+
+    function set404Error() {
+        res.status(404).render('tasks/error', {
+            title: 'Ошибка 404: Задача не найдена', // устанавливаем мета-title
+        })
+    }
+
+    if (!ObjectId.isValid(req.params.id)) {
+        return set404Error()
+    }
+
     const task = await Task.findById(req.params.id)
-    res.render('tasks/edit', {
-        title: `Задача #${task._id}`, // устанавливаем мета-title
-        task, // передаём объект задачи
-        error: req.flash('error')
-    })
+
+    if (!task) {
+        return set404Error()
+    }
+
+    if (task.roles) {
+        const users = Object.values(task.roles).map(v => v.toString())
+
+        // если текущий пользователь присутствует в списке пользователей задачи
+        if (users.includes(req.session.user._id.toString())) {
+            res.render('tasks/edit', {
+                title: `Задача #${task._id}`, // устанавливаем мета-title
+                task, // передаём объект задачи
+                error: req.flash('error')
+            })
+        } else {
+            res.status(403).render('tasks/forbidden', {
+                title: 'Доступ запрещён', // устанавливаем мета-title
+            })
+        }
+    }
 })
 
 router.get('/:id/delete', auth, async (req, res) => {
