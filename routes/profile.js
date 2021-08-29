@@ -3,15 +3,15 @@ const User = require('../models/user')
 const Jobs = require('../models/jobs')
 const Roles = require('../models/role')
 const ObjectId = require('mongoose').Types.ObjectId
+const {validationResult} = require('express-validator')
+const { profileValidators } = require('../utils/validators')
 const router = Router()
 const auth = require('../middleware/auth')
-const path = require('path')
-const fs = require('fs')
 const func = require('./func/functions')
 
 router.get('/', auth, async (req, res) => {
 
-    const user = await User.findOne({ email: req.session.user.email }).populate('job').populate('role')
+    const user = await User.findById(req.session.user._id).populate('job').populate('role')
     const birthday = func.getFormattedDate(user.birthday)
 
     const rolesDB = await Roles.find()
@@ -25,14 +25,24 @@ router.get('/', auth, async (req, res) => {
         user,
         birthday,
         jobs,
-        roles
+        roles,
+        error: req.flash('error')
     })
 })
 
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, profileValidators, async (req, res) => {
+    const errors = validationResult(req) // получаем ошибки валдации (если есть)
+    if (!errors.isEmpty()) { // если переменная с ошибками не пуста
+        req.flash('error', errors.array()[0].msg)
+        return res.status(422).redirect('/profile')
+    }
 
     const id = req.session.user._id
     let data = req.body
+
+    if (data.email !== req.session.user.email) {
+        req.session.user.email = data.email
+    }
 
     data.name = {
         first: req.body.firstname,

@@ -1,9 +1,12 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
 const Customer = require('../models/customer')
 const Service = require('../models/service')
+const {validationResult} = require('express-validator')
+const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
 const auth = require('../middleware/auth')
 const func = require('./func/functions')
+const { customersValidators } = require('../utils/validators')
 
 router.get('/', auth, async (req, res) => {
 
@@ -29,13 +32,14 @@ router.get('/add', auth, async (req, res) => {
     })
 })
 
-router.post('/add', auth, async (req, res) => {
+router.post('/add', auth, customersValidators, async (req, res) => {
 
     const data = req.body
 
-    if (!data.name) {
-        req.flash('error', 'Укажите наименование')
-        res.redirect('/customers/add')
+    const errors = validationResult(req) // получаем ошибки валдации (если есть)
+    if (!errors.isEmpty()) { // если переменная с ошибками не пуста
+        req.flash('error', errors.array()[0].msg)
+        return res.status(422).redirect('/customers/add')
     }
 
     data.projects = func.getJSONDataFromString(data.projects)
@@ -66,7 +70,6 @@ router.post('/add', auth, async (req, res) => {
     }
 })
 
-
 router.get('/:id', auth, async (req, res) => {
 
     const customer = await Customer.findById(req.params.id).populate('service')
@@ -80,12 +83,20 @@ router.get('/:id', auth, async (req, res) => {
         title: 'Редактирование карточки клиента',
         customer,
         services,
-        date
+        date,
+        error: req.flash('error')
     })
 })
 
-router.post('/edit', auth,async (req, res) => {
+router.post('/edit', auth, customersValidators, async (req, res) => {
     const {id} = req.body // забираем id из объекта req.body в переменную
+
+    const errors = validationResult(req) // получаем ошибки валдации (если есть)
+    if (!errors.isEmpty()) { // если переменная с ошибками не пуста
+        req.flash('error', errors.array()[0].msg)
+        return res.status(422).redirect(`/customers/${id}`)
+    }
+
     delete req.body.id // удаляем req.body.id, так как в MongoDB поле называется "_id", а в нашем запросе "id"
 
     const data = req.body

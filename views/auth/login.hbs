@@ -36,11 +36,11 @@
                     <div class="field">
                         <label class="label">Пароль</label>
                         <div class="control has-icons-left has-icons-right">
-                            <input class="input is-medium" :class="passwd ? 'is-success' : ''" type="password" placeholder="" name="passwd" v-model="passwd">
+                            <input class="input is-medium" :class="password ? 'is-success' : ''" type="password" placeholder="" name="password" v-model="password">
                             <span class="icon is-small is-left">
                               <i class="fas fa-key"></i>
                             </span>
-                            <span class="icon is-small is-right" v-if="passwd !== ''">
+                            <span class="icon is-small is-right" v-if="password !== ''">
                               <i class="fas fa-check"></i>
                             </span>
                         </div>

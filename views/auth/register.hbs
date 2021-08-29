@@ -18,7 +18,7 @@
                     <div class="field">
                         <label class="label">E-mail</label>
                         <div class="control has-icons-left has-icons-right">
-                            <input class="input is-medium" :class="emailCheck" type="email" placeholder="Text input" name="email" v-model="email">
+                            <input class="input is-medium" :class="emailCheck" type="email" placeholder="Text input" name="email" data-value="{{ data.email }}" v-model="email">
                             <span class="icon is-small is-left">
                               <i class="fas fa-user"></i>
                             </span>
@@ -36,11 +36,11 @@
                     <div class="field">
                         <label class="label">Введите пароль</label>
                         <div class="control has-icons-left has-icons-right">
-                            <input class="input is-medium" :class="passwordCheck" type="password" placeholder="" name="passwd" v-model="passwd">
+                            <input class="input is-medium" :class="passwordCheck" type="password" placeholder="" name="password" v-model="password">
                             <span class="icon is-small is-left">
                               <i class="fas fa-key"></i>
                             </span>
-                            <template v-if="passwd !== ''">
+                            <template v-if="password !== ''">
                                 <span class="icon is-small is-right" v-if="isEqualPass">
                                   <i class="fas fa-check"></i>
                                 </span>
@@ -73,7 +73,7 @@
                     <div class="field">
                         <label class="label">Имя</label>
                         <div class="control has-icons-left has-icons-right">
-                            <input class="input is-medium" :class="nameCheck" type="text" placeholder="Text input" name="name" v-model="name">
+                            <input class="input is-medium" :class="nameCheck" type="text" placeholder="Text input" name="name" data-value="{{ data.name }}" v-model="name">
                             <span class="icon is-small is-left">
                               <i class="fas fa-user"></i>
                             </span>

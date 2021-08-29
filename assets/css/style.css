@@ -151,6 +151,9 @@ input:checked + .slider:before {
 .page-single-task .field {
   margin-bottom: 1.25rem;
 }
+.page-single-profile .help {
+  margin-bottom: 0.25rem;
+}
 
 .input-link {
   position: relative;

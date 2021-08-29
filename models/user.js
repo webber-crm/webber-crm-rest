@@ -5,7 +5,7 @@ const user = new Schema({
         type: String,
         required: true
     },
-    passwd: {
+    password: {
         type: String,
         required: true
     },

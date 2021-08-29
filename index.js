@@ -8,7 +8,7 @@ const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
 const Handlebars = require('handlebars')
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
-const { MONGODB_URI } = require('./config')
+const keys = require('./config')
 
 const fileupload = require('express-fileupload')
 const variables = require('./middleware/variables')
@@ -29,7 +29,7 @@ const hbs = exphbs.create({
 
 const store = new MongoStore({
     connection: 'sessions',
-    uri: MONGODB_URI
+    uri: keys.MONGODB_URI
 })
 
 /*
@@ -68,7 +68,7 @@ app.use(express.urlencoded({extended: true}))
     сессии express-session
  */
 app.use(session({
-    secret: 'studio',
+    secret: keys.SESSION_SECRET,
     saveUninitialized: true,
     resave: false,
     store
@@ -118,7 +118,7 @@ async function start() {
             1 параметр - url от MongoDB
             2 параметр - различные опции | useNewUrlParser: true, useUnifiedTopology: true - для лучшей совместимости
          */
-        await mongoose.connect(MONGODB_URI, {
+        await mongoose.connect(keys.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false,

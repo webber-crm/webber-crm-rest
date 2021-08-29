@@ -5,6 +5,11 @@
 
         <div class="columns is-centered">
             <div class="column is-6">
+
+                {{#if error}}
+                    <p class="help help-big is-danger">{{ error }}</p>
+                {{/if}}
+
                 <form method="POST" action="/tasks/edit">
                     <div class="field">
                         <label class="label">Задача</label>
@@ -45,7 +50,6 @@
                             </div>
                         </div>
                     </div>
-
 
                     <div class="field-body field-body-not-last">
                         <div class="field">

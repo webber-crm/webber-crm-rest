@@ -101,7 +101,7 @@ const pageAuth = new Vue({
     data: {
         name: "",
         email: "",
-        passwd: "",
+        password: "",
         confirm: "",
         isEqualPass: true,
         isValidateEmail: true,
@@ -114,9 +114,9 @@ const pageAuth = new Vue({
     },
     computed: {
         passwordCheck() {
-            this.isEqualPass = this.passwd === this.confirm
+            this.isEqualPass = this.password === this.confirm
 
-            if (this.passwd !== "") {
+            if (this.password !== "") {
                 return this.isEqualPass ? "is-success" : "is-danger"
             }
         },
@@ -136,6 +136,18 @@ const pageAuth = new Vue({
                 return this.isValidateName ? "is-success" : "is-danger"
             }
         }
+    },
+    created() {
+        const inputs = document.querySelectorAll('[data-value]')
+        inputs.forEach(item => {
+            console.log(item)
+            const name = item.getAttribute('name')
+            const value = item.dataset.value
+
+            if (name) {
+                this[name] = value
+            }
+        })
     }
 })
 

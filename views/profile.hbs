@@ -1,4 +1,4 @@
-<section class="section page-single-customer" id="page-single">
+<section class="section page-single-profile" id="page-single">
 
         <h1 class="title center">{{ user.name.first }} {{ user.name.last }}</h1>
         <div class="subtitle center">Личный кабинет</div>
@@ -23,7 +23,7 @@
                                     <div class="field">
                                         <label class="label">Имя</label>
                                         <div class="control">
-                                            <input name="firstname" class="input" type="text" value="{{ user.name.first }}">
+                                            <input name="firstname" class="input" type="text" value="{{ user.name.first }}" required>
                                         </div>
                                     </div>
 
@@ -67,7 +67,7 @@
                                         <label class="label">E-mail</label>
                                         <div class="field">
                                             <div class="control w-100">
-                                                <input name="email" class="input" type="email" value="{{ user.email }}">
+                                                <input name="email" class="input" type="email" value="{{ user.email }}" required>
                                             </div>
                                         </div>
                                     </div>
@@ -157,6 +157,10 @@
                                     </form>
                                 </div>
                             </section>
+
+                            {{#if error}}
+                                <p class="help help-big is-danger">{{ error }}</p>
+                            {{/if}}
                         </div>
                     </div>
 

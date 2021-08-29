@@ -1,9 +1,11 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
 const Task = require('../models/task')
 const User = require('../models/user')
+const {validationResult} = require('express-validator')
 const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
 const auth = require('../middleware/auth')
+const { taskValidators } = require('../utils/validators')
 
 router.get('/', auth, async (req, res) => {
     /*
@@ -28,16 +30,22 @@ router.get('/', auth, async (req, res) => {
     })
 })
 
-router.get('tasks/add', auth, (req, res) => {
-    res.render('add-task', {
+router.get('/add', auth, (req, res) => {
+    res.render('tasks/add', {
         title: 'Новая задача'
     })
 })
 
-router.post('/edit', auth,async (req, res) => {
+router.post('/edit', auth, taskValidators, async (req, res) => {
     const {id} = req.body // забираем id из объекта req.body в переменную
-    delete req.body.id // удаляем req.body.id, так как в MongoDB поле называется "_id", а в нашем запросе "id"
 
+    const errors = validationResult(req) // получаем ошибки валдации (если есть)
+    if (!errors.isEmpty()) { // если переменная с ошибками не пуста
+        req.flash('error', errors.array()[0].msg)
+        return res.status(422).redirect(`/tasks/${id}`)
+    }
+
+    delete req.body.id // удаляем req.body.id, так как в MongoDB поле называется "_id", а в нашем запросе "id"
     const body = {
         name: req.body.name,
         body: req.body.body,
@@ -58,7 +66,8 @@ router.get('/:id', auth, async (req, res) => {
     const task = await Task.findById(req.params.id)
     res.render('tasks/edit', {
         title: `Задача #${task._id}`, // устанавливаем мета-title
-        task // передаём объект курса
+        task, // передаём объект задачи
+        error: req.flash('error')
     })
 })
 
@@ -77,7 +86,22 @@ router.get('/:id/turn-on', auth, async (req, res) => {
     res.redirect('/tasks')
 })
 
-router.post('/add', auth, async (req, res) => {
+router.post('/add', auth, taskValidators, async (req, res) => {
+    const errors = validationResult(req) // получаем ошибки валдации (если есть)
+    if (!errors.isEmpty()) { // если переменная с ошибками не пуста
+        const {name, body} = req.body
+        req.flash('error', errors.array()[0].msg)
+
+        return res.status(422).render('tasks/add', {
+            title: 'Новая задача', // устанавливаем мета-title
+            error: req.flash('error'),
+            data: {
+                name,
+                body
+            }
+        })
+    }
+
     const tasks = await Task.find()
 
     const task = new Task({

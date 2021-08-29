@@ -5,18 +5,23 @@
 
         <div class="columns is-centered">
             <div class="column is-6">
+
+                {{#if error}}
+                    <p class="help help-big is-danger">{{ error }}</p>
+                {{/if}}
+
                 <form method="POST" action="/tasks/add">
                     <div class="field">
                         <label class="label">Задача</label>
                         <div class="control">
-                            <input class="input" type="text" placeholder="Заголовок" name="name">
+                            <input class="input" type="text" placeholder="Заголовок" name="name" value="{{ data.name }}">
                         </div>
                     </div>
 
                     <div class="field">
                         <label class="label">Описание задачи</label>
                         <div class="control">
-                            <textarea class="textarea" placeholder="Lorem ipsum dolor" name="body"></textarea>
+                            <textarea class="textarea" placeholder="Lorem ipsum dolor" name="body">{{ data.body }}</textarea>
                         </div>
                     </div>
 
