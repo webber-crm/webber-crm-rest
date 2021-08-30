@@ -18,6 +18,7 @@ const tasksRoutes = require('./routes/tasks')
 const authRoutes = require('./routes/auth')
 const profileRoutes = require('./routes/profile')
 const customersRoutes = require('./routes/customers')
+const errorHandler = require('./middleware/error')
 
 const app = express()
 
@@ -107,6 +108,8 @@ app.use('/tasks', tasksRoutes)
 app.use('/auth', authRoutes)
 app.use('/profile', profileRoutes)
 app.use('/customers', customersRoutes)
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 80
 

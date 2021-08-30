@@ -20,6 +20,10 @@
   justify-content: center;
 }
 
+.error-404 {
+  margin-top: 120px;
+}
+
 .switch {
   position: relative;
   display: inline-block;
