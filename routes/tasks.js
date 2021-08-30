@@ -18,8 +18,13 @@ router.get('/', auth, async (req, res) => {
 
     const tasks = data.filter(t => {
         if (t.roles) {
-            // получаем список пользователей внутри roles
-            const users = Object.values(t.roles).map(v => v.toString())
+            // получаем список наблюдателей внутри roles (observers)
+            const observers = t.roles.observers ? t.roles.observers.map(obj => obj._id) : [];
+
+            // получаем список пользователей, которые имеют доступ к задаче (находятся внутри roles)
+            const users = [t.roles.author, t.roles.developer._id]
+                .concat(observers)
+                .map(item => item ? item.toString() : item)
 
             // если текущий пользователь присутствует в списке пользователей задачи
             if (users.includes(req.session.user._id.toString())) {
@@ -43,9 +48,12 @@ router.get('/', auth, async (req, res) => {
     })
 })
 
-router.get('/add', auth, (req, res) => {
+router.get('/add', auth, async (req, res) => {
+    const users = await User.find()
+
     res.render('tasks/add', {
-        title: 'Новая задача'
+        title: 'Новая задача',
+        users
     })
 })
 
@@ -65,6 +73,11 @@ router.post('/edit', auth, taskValidators, async (req, res) => {
         time: {
             estimate: req.body.estimate,
             fact: req.body.fact
+        },
+        roles: {
+            author: req.body.author,
+            developer: req.body.developer,
+            observers: req.body.observers
         }
     }
     await Task.findByIdAndUpdate(id, body)
@@ -87,20 +100,41 @@ router.get('/:id', auth, async (req, res) => {
         return set404Error()
     }
 
-    const task = await Task.findById(req.params.id)
+    const roles = await Task.findById(req.params.id, 'roles')
+    const task = await Task.findById(req.params.id).populate('roles.author').populate('roles.developer')
+    const users = await User.find()
 
-    if (!task) {
+    if (!roles) {
         return set404Error()
     }
 
-    if (task.roles) {
-        const users = Object.values(task.roles).map(v => v.toString())
+    const observers = roles.roles.observers ? roles.roles.observers.map(obj => obj._id) : []
+
+    const values = Object.values(roles.roles)
+        .filter(i => typeof i === 'object' && !Array.isArray(i))
+        .concat(observers)
+
+    if (roles) {
+        const members = values.map(v => v ? v.toString() : [])
+        const obs = await User.find({_id: {$in: observers}})
+
+        const roles = {
+            author: task.roles.author,
+            developer: task.roles.developer,
+            observers: obs
+        }
+
+        users.dev = users.filter(user => user._id.toString() !== roles.developer._id.toString())
+        users.obs = users.filter(user => roles.observers.map(item => item._id.toString()).includes(user._id.toString()) === false)
 
         // если текущий пользователь присутствует в списке пользователей задачи
-        if (users.includes(req.session.user._id.toString())) {
+        if (members.includes(req.session.user._id.toString())) {
+
             res.render('tasks/edit', {
                 title: `Задача #${task._id}`, // устанавливаем мета-title
                 task, // передаём объект задачи
+                roles,
+                users,
                 error: req.flash('error')
             })
         } else {
@@ -130,11 +164,14 @@ router.post('/add', auth, taskValidators, async (req, res) => {
     const errors = validationResult(req) // получаем ошибки валдации (если есть)
     if (!errors.isEmpty()) { // если переменная с ошибками не пуста
         const {name, body} = req.body
+        const users = await User.find()
+
         req.flash('error', errors.array()[0].msg)
 
         return res.status(422).render('tasks/add', {
             title: 'Новая задача', // устанавливаем мета-title
             error: req.flash('error'),
+            users,
             data: {
                 name,
                 body
@@ -144,6 +181,9 @@ router.post('/add', auth, taskValidators, async (req, res) => {
 
     const tasks = await Task.find()
 
+    const bodyObservers = req.body.observers
+    const observers = bodyObservers && Array.isArray(bodyObservers) ? bodyObservers.map(item => ObjectId(item) ) : [ ObjectId(bodyObservers) ]
+
     const task = new Task({
         name: req.body.name,
         body: req.body.body,
@@ -151,7 +191,10 @@ router.post('/add', auth, taskValidators, async (req, res) => {
         idx: tasks.length + 1,
         roles: {
             author: ObjectId(req.session.user._id),
-            developer: ObjectId(req.session.user._id)
+            developer: ObjectId(req.body.developer),
+            observers
+
+
         }
     })
 

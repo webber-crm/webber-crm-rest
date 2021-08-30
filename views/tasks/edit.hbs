@@ -53,6 +53,50 @@
 
                     <div class="field-body field-body-not-last">
                         <div class="field">
+                            <label class="label">Автор задачи</label>
+                            <div class="control">
+                                <input class="input" type="text" value="{{ roles.author.name.first }} {{ roles.author.name.last }}" readonly>
+                                <input type="hidden" name="author" value="{{ roles.author._id }}" required>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Разработчик</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select name="developer">
+                                        <option value="{{ roles.developer._id }}">{{ roles.developer.name.first }} {{ roles.developer.name.last }}</option>
+                                        {{#if users.dev}}
+                                            {{#each users.dev}}
+                                                <option value="{{ _id }}">{{ name.first }} {{ name.last }}</option>
+                                            {{/each}}
+                                        {{/if}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Наблюдатели</label>
+                        <div class="control">
+                            <div class="select is-multiple">
+                                <select name="observers" multiple>
+                                    {{#each roles.observers}}
+                                        <option value="{{ _id }}" selected>{{ name.first }} {{ name.last }}</option>
+                                    {{/each}}
+                                    {{#if users}}
+                                        {{#each users.obs}}
+                                                <option value="{{ _id }}">{{ name.first }} {{ name.last }}</option>
+                                        {{/each}}
+                                    {{/if}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-body field-body-not-last">
+                        <div class="field">
                             <label class="label">Оценка (ч)</label>
                             <div class="control">
                                 <input class="input" type="text" placeholder="" name="estimate" value="{{ task.time.estimate }}">

@@ -82,6 +82,7 @@ exports.loginValidators = [
 exports.taskValidators = [
     body(['name', 'body'], 'Название и тело задачи должно быть длинее 3 символов')
         .isLength({min: 3})
+        .trim()
 ]
 
 exports.customersValidators = [
@@ -100,7 +101,9 @@ exports.customersValidators = [
 ]
 
 exports.profileValidators = [
-    body('firstname', 'Имя  не должно быть пустым').isLength({min: 1}),
+    body('firstname', 'Имя  не должно быть пустым')
+        .isLength({min: 1})
+        .trim(),
     body('email')
         .isEmail()
         .withMessage('Введите корректный Email')

@@ -35,12 +35,10 @@ const task = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'User'
         },
-        observers: [{
-            user: {
-                type: Schema.Types.ObjectId,
-                ref: 'User'
-            }
-        }]
+        observers: {
+            type: [Schema.Types.ObjectId],
+            ref: 'User'
+        }
     },
     projectID: {
         type: Schema.Types.ObjectId,

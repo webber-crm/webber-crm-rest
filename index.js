@@ -24,7 +24,8 @@ const app = express()
 const hbs = exphbs.create({
     defaultLayout: 'default', // шаблон по умолчанию
     extname: 'hbs', // расширение страниц (views) и шаблонов (layouts) - (по умолчанию .handlebars)
-    handlebars: allowInsecurePrototypeAccess(Handlebars) // исправляем ошибку при запросе с MongoDB
+    handlebars: allowInsecurePrototypeAccess(Handlebars), // исправляем ошибку при запросе с MongoDB
+    helpers: require('./utils/hbs-helper')
 })
 
 const store = new MongoStore({
@@ -107,7 +108,7 @@ app.use('/auth', authRoutes)
 app.use('/profile', profileRoutes)
 app.use('/customers', customersRoutes)
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 80
 
 async function start() {
     try {

@@ -51,6 +51,44 @@
                         </div>
                     </div>
 
+                    <div class="field-body field-body-not-last">
+                        <div class="field">
+                            <label class="label">Автор задачи</label>
+                            <div class="control">
+                                    <input class="input" type="text" value="{{ user.name.first }} {{ user.name.last }}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Разработчик</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select name="developer">
+                                        {{#if users}}
+                                            {{#each users}}
+                                                <option value="{{ _id }}">{{ name.first }} {{ name.last }}</option>
+                                            {{/each}}
+                                        {{/if}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Наблюдатели</label>
+                        <div class="control">
+                            <div class="select is-multiple">
+                                <select name="observers" multiple>
+                                    {{#if users}}
+                                        {{#each users}}
+                                            <option value="{{ _id }}">{{ name.first }} {{ name.last }}</option>
+                                        {{/each}}
+                                    {{/if}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="field-body field-body-not-last">
                         <div class="field">
