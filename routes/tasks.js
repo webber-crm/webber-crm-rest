@@ -15,7 +15,7 @@ router.get('/', auth, async (req, res) => {
         2 параметр - объект с любыми нужными нам опциями. Например, передадим мета-title
     */
 
-    const data = await Task.find().populate('roles.developer')
+    const data = await Task.find().populate('roles.developer').populate('customer')
 
     const tasks = data.filter(t => {
         if (t.roles) {
