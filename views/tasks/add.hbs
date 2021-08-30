@@ -1,4 +1,4 @@
-<section class="section page-edit">
+<section class="section page-edit" id="page-single-task">
     <div class="container">
 
         <h1 class="title center">Редактирование</h1>
@@ -30,21 +30,26 @@
                             <label class="label">Клиент</label>
                             <div class="control">
                                 <div class="select">
-                                    <select name="customer">
-                                        <option>Клиент</option>
-                                        <option>3put</option>
+                                    <select name="customer" @change="onChangeCustomer($event)">
+                                        <option disabled selected>Клиент</option>
+                                        {{#if customers}}
+                                            {{#each customers}}
+                                            <option value="{{ _id }}">{{ name }}</option>
+                                            {{/each}}
+                                        {{/if}}
                                     </select>
                                 </div>
                             </div>
                         </div>
 
                         <div class="field">
-                            <label class="label">Сайт</label>
+                            <label class="label">Проект</label>
                             <div class="control">
                                 <div class="select">
                                     <select name="project">
-                                        <option>Сайт</option>
-                                        <option>demo.com</option>
+                                        <template v-for="project of projects">
+                                            <option :selected="project.selected" :disabled="project.selected">\{{ project.domain }}</option>
+                                        </template>
                                     </select>
                                 </div>
                             </div>

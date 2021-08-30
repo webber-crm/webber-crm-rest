@@ -1,6 +1,7 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
 const Task = require('../models/task')
 const User = require('../models/user')
+const Customer = require('../models/customer')
 const {validationResult} = require('express-validator')
 const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
@@ -50,10 +51,12 @@ router.get('/', auth, async (req, res) => {
 
 router.get('/add', auth, async (req, res) => {
     const users = await User.find()
+    const customers = await Customer.find()
 
     res.render('tasks/add', {
         title: 'Новая задача',
-        users
+        users,
+        customers
     })
 })
 
@@ -78,7 +81,9 @@ router.post('/edit', auth, taskValidators, async (req, res) => {
             author: req.body.author,
             developer: req.body.developer,
             observers: req.body.observers
-        }
+        },
+        customer: req.body.customer,
+        project: req.body.project
     }
     await Task.findByIdAndUpdate(id, body)
     res.redirect('/tasks')
@@ -101,8 +106,10 @@ router.get('/:id', auth, async (req, res) => {
     }
 
     const roles = await Task.findById(req.params.id, 'roles')
-    const task = await Task.findById(req.params.id).populate('roles.author').populate('roles.developer')
+    const task = await Task.findById(req.params.id).populate('roles.author').populate('roles.developer').populate('customer')
     const users = await User.find()
+    const customersDB = await Customer.find()
+    const customers = customersDB.filter(c => c._id.toString() !== task.customer._id.toString())
 
     if (!roles) {
         return set404Error()
@@ -135,6 +142,7 @@ router.get('/:id', auth, async (req, res) => {
                 task, // передаём объект задачи
                 roles,
                 users,
+                customers,
                 error: req.flash('error')
             })
         } else {
@@ -165,6 +173,7 @@ router.post('/add', auth, taskValidators, async (req, res) => {
     if (!errors.isEmpty()) { // если переменная с ошибками не пуста
         const {name, body} = req.body
         const users = await User.find()
+        const customers = await Customer.find()
 
         req.flash('error', errors.array()[0].msg)
 
@@ -172,6 +181,7 @@ router.post('/add', auth, taskValidators, async (req, res) => {
             title: 'Новая задача', // устанавливаем мета-title
             error: req.flash('error'),
             users,
+            customers,
             data: {
                 name,
                 body
@@ -193,9 +203,9 @@ router.post('/add', auth, taskValidators, async (req, res) => {
             author: ObjectId(req.session.user._id),
             developer: ObjectId(req.body.developer),
             observers
-
-
-        }
+        },
+        customer: req.body.customer,
+        project: req.body.project
     })
 
     try {

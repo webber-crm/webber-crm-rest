@@ -5,7 +5,7 @@ const project = new Schema({
         type: String,
         required: true
     },
-    customerID: {
+    customer: {
         type: Schema.Types.ObjectId,
         ref: 'Customer'
     }

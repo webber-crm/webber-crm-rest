@@ -121,4 +121,13 @@ router.get('/:id/delete', auth, async (req, res) => {
     res.redirect('/customers')
 })
 
+router.get('/api/:id', async (req, res) => {
+    const filed = req.query.field || ''
+    const customer = await Customer.findById(req.params.id, filed)
+
+    if (customer) {
+        res.status(200).send(JSON.stringify(customer))
+    }
+})
+
 module.exports = router

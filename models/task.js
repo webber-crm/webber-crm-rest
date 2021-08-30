@@ -44,7 +44,12 @@ const task = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Project'
     },
-    customerID: {
+    project: {
+        type: String,
+        required: true
+    },
+    customer: {
+        required: true,
         type: Schema.Types.ObjectId,
         ref: 'Customer'
     },

@@ -96,6 +96,37 @@ const pageSingleCustomer = new Vue({
     }
 })
 
+const pageSingleTask = new Vue({
+    el: '#page-single-task',
+    data: {
+        projects: [
+            {domain: 'Проект', selected: true, disabled: true}
+        ]
+    },
+    methods: {
+        onChangeCustomer(e) {
+            const {value} = e.target
+            fetch('/customers/api/' + value + '?field=projects', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => this.projects = data.projects.map(p => ({ domain: p })))
+        }
+    },
+    created() {
+        console.log(this.projects)
+        const currentProject = document.getElementById('project').value
+        const projects = document.getElementById('projects').value.split(',')
+        this.projects = projects
+            .map(p => ({ domain: p }))
+            .map(p => p.domain === currentProject ? {domain: p.domain, selected: true } : { domain: p.domain, selected: false } )
+        console.log(this.projects)
+    }
+})
+
 const pageAuth = new Vue({
     el: '#auth',
     data: {

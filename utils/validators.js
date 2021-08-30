@@ -82,6 +82,9 @@ exports.loginValidators = [
 exports.taskValidators = [
     body(['name', 'body'], 'Название и тело задачи должно быть длинее 3 символов')
         .isLength({min: 3})
+        .trim(),
+    body(['customer', 'project'], 'Поля "Клиент" и "Проект" обязательны для заполнения')
+        .isLength({min: 1})
         .trim()
 ]
 
