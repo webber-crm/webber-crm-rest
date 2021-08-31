@@ -52,44 +52,35 @@ router.get('/register', async (req, res) => {
     }
 })
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginValidators, async (req, res) => {
+    const errors = validationResult(req) // получаем ошибки валдации (если есть)
+    if (!errors.isEmpty()) { // если переменная с ошибками не пуста
+        req.flash('error', errors.array()[0].msg)
+        return res.status(422).redirect('/auth/login')
+    }
+
     const { email, password } = req.body
-    const users = await User.findOne({ email })
-        .then(async (user) => {
-            if (req.body.password) {
-                const isEqual = await bcrypt.compare(password, user.password)
+    const user = await User.findOne({ email })
 
-                if (isEqual) {
-                    req.session.isAuthorized = true // устанавливаем ключ сессии isAuthenticated = true
-                    req.session.user = user
+    if (req.body.password) {
+        const isEqual = await bcrypt.compare(password, user.password)
 
-                    /*
-                       сохраняем сессию, добавляем обработку,
-                       чтобы редирект не выполнился раньше, чем сохранится сессия
-                    */
-                    req.session.save(err => {
-                        if (err) {
-                            throw err
-                        }
-                        res.redirect('/')
-                    })
+        if (isEqual) {
+            req.session.isAuthorized = true // устанавливаем ключ сессии isAuthenticated = true
+            req.session.user = user
 
-                } else {
-                    req.flash('error', 'Неверный пароль')
-                    console.log('Wrong password')
-                    res.redirect('/auth/login')
+            /*
+               сохраняем сессию, добавляем обработку,
+               чтобы редирект не выполнился раньше, чем сохранится сессия
+            */
+            req.session.save(err => {
+                if (err) {
+                    throw err
                 }
-            } else {
-                req.flash('error', 'Введите пароль')
-                console.log('Password is not exist')
-                res.redirect('/auth/login')
-            }
-        })
-        .catch(err => {
-            req.flash('error', 'Пользователя с таким email не существует')
-            res.redirect('/auth/login')
-            throw Error('User is not exist')
-        })
+                res.redirect('/')
+            })
+        }
+    }
 })
 
 router.post('/register', registerValidators, async (req, res) => {
@@ -117,7 +108,6 @@ router.post('/register', registerValidators, async (req, res) => {
             создаём хэш пароля
          */
         const hashPassword = await bcrypt.hash(password, 10)
-
         const perm = await Permissions.findOne({idx: 4})
 
         const user = new User({
@@ -143,7 +133,7 @@ router.post('/register', registerValidators, async (req, res) => {
 
 })
 
-router.get('/logout', loginValidators, async (req, res) => {
+router.get('/logout', async (req, res) => {
     // очищаем сессию
     req.session.destroy(() => {
         // callback-функция может использоваться для удаления сессии из MongoDB
