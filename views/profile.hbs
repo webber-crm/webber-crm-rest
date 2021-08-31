@@ -89,14 +89,9 @@
                                         <div class="control">
                                             <div class="select">
                                                 <select name="job">
-                                                    {{#if user.job }}
-                                                    <option value="{{ user.job._id }}" checked>{{ user.job.title }}</option>
-                                                    {{else}}
-                                                        <option selected disabled>Выбрать</option>
-                                                    {{/if}}
                                                     {{#if jobs}}
                                                         {{#each jobs}}
-                                                            <option value="{{ _id }}">{{ title }}</option>
+                                                            <option value="{{ _id }}" {{#if selected}}selected{{/if}}>{{ title }}</option>
                                                         {{/each}}
                                                     {{/if}}
                                                 </select>
@@ -108,16 +103,10 @@
                                         <label class="label">Права доступа</label>
                                         <div class="control">
                                             <div class="select">
-                                                <select name="role">
-                                                    {{#if user.permissions}}
-                                                    <option value="{{ user.permissions._id }}" selected>{{ user.permissions.title }}</option>
-                                                    {{else}}
-                                                    <option selected disabled>Выбрать</option>
-                                                    {{/if}}
-
+                                                <select name="permissions">
                                                     {{#if permissions}}
                                                         {{#each permissions}}
-                                                            <option value="{{ _id }}">{{ title }}</option>
+                                                            <option value="{{ _id }}" {{#if selected}}selected{{/if}}>{{ title }}</option>
                                                         {{/each}}
                                                     {{/if}}
                                                 </select>

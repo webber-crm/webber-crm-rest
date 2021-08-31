@@ -81,8 +81,7 @@ router.post('/add', auth, customersValidators, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
 
     const customer = await Customer.findById(req.params.id).populate('service')
-    const servicesDB = await Service.find()
-    const services = servicesDB.filter(s => s._id.toString() !== customer.service._id.toString())
+    const services = await func.getFilteredSelectListFromDB(Service, customer.service)
     const date = func.getFormattedDate(customer.info.dateFrom)
 
     customer.projects = JSON.stringify(customer.projects)
