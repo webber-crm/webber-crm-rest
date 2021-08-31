@@ -56,8 +56,8 @@ exports.loginValidators = [
             }
         })
         .normalizeEmail(), // санитайзер, нормализует Email
-    body('password', 'Пароль должен быть минимум 6 символов')
-        .isLength({min: 6, max: 56})
+    body('password', 'Пароль должен быть минимум 8 символов')
+        .isLength({min: 8, max: 32})
         .isAlphanumeric()
         .trim() // санитайзер trim, удаляет пробелы по краям
         .custom(async (value, {req}) => {

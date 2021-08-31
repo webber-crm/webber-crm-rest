@@ -14,11 +14,8 @@ router.get('/', auth, async (req, res) => {
     const user = await User.findById(req.session.user._id).populate('job').populate('permissions')
     const birthday = user.birthday ? func.getFormattedDate(user.birthday) : ""
 
-    const permissionsDB = await Permissions.find()
-    const permissions = user.permissions ? permissionsDB.filter(r => r._id.toString() !== user.permissions._id.toString()) : permissionsDB
-
-    const jobsDB = await Jobs.find()
-    const jobs = user.job ? jobsDB.filter(f => f._id.toString() !== user.job._id.toString()) : jobsDB
+    const permissions = await func.getFilteredSelectListFromDB(Permissions, user.permissions)
+    const jobs = await func.getFilteredSelectListFromDB(Jobs, user.job)
 
     res.render('profile', {
         title: 'Профиль',
@@ -50,8 +47,13 @@ router.post('/', auth, profileValidators, async (req, res) => {
         middle: req.body.middlename
     }
 
-    data.job = new ObjectId(req.body.job)
-    data.birthday = new Date(req.body.birthday)
+    if (req.body.job) {
+        data.job = new ObjectId(req.body.job)
+    }
+
+    if (data.birthday) {
+        data.birthday = new Date(req.body.birthday)
+    }
 
     delete data.id
     delete data.firstname

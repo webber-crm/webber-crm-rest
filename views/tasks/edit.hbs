@@ -73,10 +73,9 @@
                             <div class="control">
                                 <div class="select">
                                     <select name="developer">
-                                        <option value="{{ roles.developer._id }}">{{ roles.developer.name.first }} {{ roles.developer.name.last }}</option>
                                         {{#if users.dev}}
                                             {{#each users.dev}}
-                                                <option value="{{ _id }}">{{ name.first }} {{ name.last }}</option>
+                                                <option value="{{ _id }}" {{#if selected}}selected{{/if}}>{{ name.first }} {{ name.last }}</option>
                                             {{/each}}
                                         {{/if}}
                                     </select>
@@ -90,12 +89,9 @@
                         <div class="control">
                             <div class="select is-multiple">
                                 <select name="observers" multiple>
-                                    {{#each roles.observers}}
-                                        <option value="{{ _id }}" selected>{{ name.first }} {{ name.last }}</option>
-                                    {{/each}}
                                     {{#if users}}
-                                        {{#each users.obs}}
-                                                <option value="{{ _id }}">{{ name.first }} {{ name.last }}</option>
+                                        {{#each users.observers}}
+                                                <option value="{{ _id }}" {{#if selected}}selected{{/if}}>{{ name.first }} {{ name.last }}</option>
                                         {{/each}}
                                     {{/if}}
                                 </select>

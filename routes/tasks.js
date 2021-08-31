@@ -6,6 +6,7 @@ const {validationResult} = require('express-validator')
 const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
 const auth = require('../middleware/auth')
+const func = require('./func/functions')
 const { taskValidators } = require('../utils/validators')
 
 router.get('/', auth, async (req, res) => {
@@ -107,43 +108,42 @@ router.get('/:id', auth, async (req, res) => {
         return set404Error()
     }
 
+    const user = await User.findById(req.session.user._id) // текущий пользователь из сессии
     const roles = await Task.findById(req.params.id, 'roles')
-    const task = await Task.findById(req.params.id).populate('roles.author').populate('roles.developer').populate('customer')
-    const users = await User.find()
-    const user = await User.findById(req.session.user._id)
-    const customersDB = await Customer.find()
-    const customers = customersDB.filter(c => c._id.toString() !== task.customer._id.toString() && user.customers.includes(c._id.toString()))
 
     if (!roles) {
         return set404Error()
     }
 
+    const task = await Task.findById(req.params.id).populate('roles.author').populate('roles.developer').populate('customer')
+    const users = await User.find() // получаем всех пользователей
+    const customers = await func.getFilteredArrayFromDB(Customer, task.customer, user.customers)
+
     const observers = roles.roles.observers ? roles.roles.observers.map(obj => obj._id) : []
 
-    const values = Object.values(roles.roles)
+    // список ID всех участников задачи (независимо от роли)
+    const members = Object.values(roles.roles)
         .filter(i => typeof i === 'object' && !Array.isArray(i))
         .concat(observers)
 
     if (roles) {
-        const members = values.map(v => v ? v.toString() : [])
-        const obs = await User.find({_id: {$in: observers}})
+        const membersToString = members.map(v => v ? v.toString() : []) // массив members, но элементы преобразованы в строку
+        const usersFromObservers = await User.find({_id: {$in: observers}}) // пользовательские данные наблюдателей
+        const usersFromRoles = {...task.roles.toObject(), observers: usersFromObservers } // пользовательские данные всех участников задачи по ролям
 
-        const roles = {
-            author: task.roles.author,
-            developer: task.roles.developer,
-            observers: obs
-        }
+        // получаем массив с объектами пользователей, где к каждому объекту добавлено свойство selected (выбран разработчик задачи)
+        users.dev = func.getFilteredSelectList(users, usersFromRoles.developer)
 
-        users.dev = users.filter(user => user._id.toString() !== roles.developer._id.toString())
-        users.obs = users.filter(user => roles.observers.map(item => item._id.toString()).includes(user._id.toString()) === false)
+        // массив с объектами пользователями, где в объектах отмечены наблюдатели (через свойство selected)
+        users.observers = func.getFilteredSelectList(users, observers)
 
         // если текущий пользователь присутствует в списке пользователей задачи
-        if (members.includes(req.session.user._id.toString())) {
+        if (membersToString.includes(req.session.user._id.toString())) {
 
             res.render('tasks/edit', {
                 title: `Задача #${task._id}`, // устанавливаем мета-title
                 task, // передаём объект задачи
-                roles,
+                roles: usersFromRoles,
                 users,
                 customers,
                 error: req.flash('error')
@@ -151,6 +151,7 @@ router.get('/:id', auth, async (req, res) => {
         } else {
             res.status(403).render('tasks/forbidden', {
                 title: 'Доступ запрещён', // устанавливаем мета-title
+                layout: 'empty'
             })
         }
     }
@@ -197,7 +198,9 @@ router.post('/add', auth, taskValidators, async (req, res) => {
     const tasks = await Task.find()
 
     const observersFromBody = req.body.observers
-    const observers = observersFromBody && Array.isArray(observersFromBody) ? observersFromBody.map(item => ObjectId(item) ) : [ ObjectId(observersFromBody) ]
+    const observers = observersFromBody && Array.isArray(observersFromBody) ?
+        observersFromBody.map(item => ObjectId(item) ) :
+        [ ObjectId(observersFromBody) ]
 
     const task = new Task({
         name: req.body.name,
