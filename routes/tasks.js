@@ -151,6 +151,7 @@ router.get('/:id', auth, async (req, res) => {
         } else {
             res.status(403).render('tasks/forbidden', {
                 title: 'Доступ запрещён', // устанавливаем мета-title
+                layout: 'empty'
             })
         }
     }
