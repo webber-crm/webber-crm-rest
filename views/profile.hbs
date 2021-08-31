@@ -88,7 +88,7 @@
                                         <label class="label">Должность</label>
                                         <div class="control">
                                             <div class="select">
-                                                <select name="job">
+                                                <select name="job" {{#if perm}}{{#morethan perm 1}}disabled{{/morethan}}{{else}}disabled{{/if}}>
                                                     {{#if jobs}}
                                                         {{#each jobs}}
                                                             <option value="{{ _id }}" {{#if selected}}selected{{/if}}>{{ title }}</option>
@@ -103,7 +103,7 @@
                                         <label class="label">Права доступа</label>
                                         <div class="control">
                                             <div class="select">
-                                                <select name="permissions">
+                                                <select name="permissions" {{#if perm}}{{#morethan perm 1}}disabled{{/morethan}}{{else}}disabled{{/if}}>
                                                     {{#if permissions}}
                                                         {{#each permissions}}
                                                             <option value="{{ _id }}" {{#if selected}}selected{{/if}}>{{ title }}</option>

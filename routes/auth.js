@@ -60,7 +60,8 @@ router.post('/login', loginValidators, async (req, res) => {
     }
 
     const { email, password } = req.body
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email }).populate('permissions')
+    const permissions = user.permissions ? user.permissions.idx : null
 
     if (req.body.password) {
         const isEqual = await bcrypt.compare(password, user.password)
@@ -68,6 +69,7 @@ router.post('/login', loginValidators, async (req, res) => {
         if (isEqual) {
             req.session.isAuthorized = true // устанавливаем ключ сессии isAuthenticated = true
             req.session.user = user
+            req.session.perm = permissions
 
             /*
                сохраняем сессию, добавляем обработку,

@@ -22,3 +22,8 @@
 .error-404 {
   padding-top: 120px;
 }
+
+select[data-disabled] {
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
