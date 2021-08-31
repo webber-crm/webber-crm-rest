@@ -1,4 +1,5 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
+const User = require('../models/user')
 const Customer = require('../models/customer')
 const Service = require('../models/service')
 const {validationResult} = require('express-validator')
@@ -10,7 +11,10 @@ const { customersValidators } = require('../utils/validators')
 
 router.get('/', auth, async (req, res) => {
 
-    const customers = await Customer.find()
+    const user = await User.findById(req.session.user._id)
+    const customers = await Customer.find({_id: {$in: user.customers}}) // выбираем клиентов, которые привязаны к пользователю
+
+    // форматируем дату начала сотрудничества
     customers.forEach(customer => {
         customer.info.date = func.getFormattedDate(customer.info.dateFrom)
     })
@@ -61,6 +65,10 @@ router.post('/add', auth, customersValidators, async (req, res) => {
 
     try {
         await customer.save() // вызываем метод класса Task для сохранения в БД
+
+        const user = await User.findByIdAndUpdate(req.session.user._id)
+        user.customers = user.customers.concat([customer._id])
+        await user.save()
 
         // делаем редирект после отправки формы
         res.redirect('/customers')
@@ -118,6 +126,11 @@ router.post('/edit', auth, customersValidators, async (req, res) => {
 
 router.get('/:id/delete', auth, async (req, res) => {
     await Customer.findByIdAndRemove(req.params.id)
+
+    const user = await User.findById(req.session.user._id)
+    user.customers = user.customers.filter(c => c.toString() !== req.params.id.toString())
+    await user.save()
+
     res.redirect('/customers')
 })
 

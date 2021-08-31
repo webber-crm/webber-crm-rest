@@ -1,7 +1,7 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
 const User = require('../models/user')
 const Jobs = require('../models/jobs')
-const Roles = require('../models/role')
+const Permissions = require('../models/permissions')
 const ObjectId = require('mongoose').Types.ObjectId
 const {validationResult} = require('express-validator')
 const { profileValidators } = require('../utils/validators')
@@ -11,21 +11,21 @@ const func = require('./func/functions')
 
 router.get('/', auth, async (req, res) => {
 
-    const user = await User.findById(req.session.user._id).populate('job').populate('role')
+    const user = await User.findById(req.session.user._id).populate('job').populate('permissions')
     const birthday = user.birthday ? func.getFormattedDate(user.birthday) : ""
 
-    const rolesDB = await Roles.find()
-    const roles = user.role ? rolesDB.filter(r => r._id.toString() !== user.role._id.toString()) : ""
+    const permissionsDB = await Permissions.find()
+    const permissions = user.permissions ? permissionsDB.filter(r => r._id.toString() !== user.permissions._id.toString()) : permissionsDB
 
     const jobsDB = await Jobs.find()
-    const jobs = user.job ? jobsDB.filter(f => f._id.toString() !== user.job._id.toString()) : ""
+    const jobs = user.job ? jobsDB.filter(f => f._id.toString() !== user.job._id.toString()) : jobsDB
 
     res.render('profile', {
         title: 'Профиль',
         user,
         birthday,
         jobs,
-        roles,
+        permissions,
         error: req.flash('error')
     })
 })

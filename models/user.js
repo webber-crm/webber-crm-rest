@@ -30,9 +30,13 @@ const user = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Jobs'
     },
-    role: {
+    permissions: {
         type: Schema.Types.ObjectId,
-        ref: 'Roles'
+        ref: 'Permissions'
+    },
+    customers: {
+        type: [Schema.Types.ObjectId],
+        ref: 'Customer'
     }
 })
 

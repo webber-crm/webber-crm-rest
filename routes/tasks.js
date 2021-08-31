@@ -27,8 +27,6 @@ router.get('/', auth, async (req, res) => {
                 .concat(observers)
                 .map(item => item ? item.toString() : item)
 
-            console.log(users)
-
             // если текущий пользователь присутствует в списке пользователей задачи
             if (users.includes(req.session.user._id.toString())) {
                 return t
@@ -52,8 +50,10 @@ router.get('/', auth, async (req, res) => {
 })
 
 router.get('/add', auth, async (req, res) => {
+    const user = await User.findById(req.session.user._id)
+
     const users = await User.find()
-    const customers = await Customer.find()
+    const customers = await Customer.find({_id: {$in: user.customers}})
 
     res.render('tasks/add', {
         title: 'Новая задача',
@@ -110,8 +110,9 @@ router.get('/:id', auth, async (req, res) => {
     const roles = await Task.findById(req.params.id, 'roles')
     const task = await Task.findById(req.params.id).populate('roles.author').populate('roles.developer').populate('customer')
     const users = await User.find()
+    const user = await User.findById(req.session.user._id)
     const customersDB = await Customer.find()
-    const customers = customersDB.filter(c => c._id.toString() !== task.customer._id.toString())
+    const customers = customersDB.filter(c => c._id.toString() !== task.customer._id.toString() && user.customers.includes(c._id.toString()))
 
     if (!roles) {
         return set404Error()
@@ -174,8 +175,10 @@ router.post('/add', auth, taskValidators, async (req, res) => {
     const errors = validationResult(req) // получаем ошибки валдации (если есть)
     if (!errors.isEmpty()) { // если переменная с ошибками не пуста
         const {name, body} = req.body
+        const user = await User.findById(req.session.user._id)
+
         const users = await User.find()
-        const customers = await Customer.find()
+        const customers = await Customer.find({_id: {$in: user.customers}})
 
         req.flash('error', errors.array()[0].msg)
 
@@ -193,8 +196,8 @@ router.post('/add', auth, taskValidators, async (req, res) => {
 
     const tasks = await Task.find()
 
-    const bodyObservers = req.body.observers
-    const observers = bodyObservers && Array.isArray(bodyObservers) ? bodyObservers.map(item => ObjectId(item) ) : [ ObjectId(bodyObservers) ]
+    const observersFromBody = req.body.observers
+    const observers = observersFromBody && Array.isArray(observersFromBody) ? observersFromBody.map(item => ObjectId(item) ) : [ ObjectId(observersFromBody) ]
 
     const task = new Task({
         name: req.body.name,

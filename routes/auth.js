@@ -1,5 +1,6 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
 const User = require('../models/user')
+const Permissions = require('../models/permissions')
 const ObjectId = require('mongoose').Types.ObjectId
 const {validationResult} = require('express-validator')
 const { registerValidators, loginValidators } = require('../utils/validators')
@@ -117,12 +118,15 @@ router.post('/register', registerValidators, async (req, res) => {
          */
         const hashPassword = await bcrypt.hash(password, 10)
 
+        const perm = await Permissions.findOne({idx: 4})
+
         const user = new User({
             email,
             password: hashPassword,
             name: {
                 first: name
-            }
+            },
+            permissions: perm._id
         })
 
         await user.save()

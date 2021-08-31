@@ -89,7 +89,11 @@
                                         <div class="control">
                                             <div class="select">
                                                 <select name="job">
+                                                    {{#if user.job }}
                                                     <option value="{{ user.job._id }}" checked>{{ user.job.title }}</option>
+                                                    {{else}}
+                                                        <option selected disabled>Выбрать</option>
+                                                    {{/if}}
                                                     {{#if jobs}}
                                                         {{#each jobs}}
                                                             <option value="{{ _id }}">{{ title }}</option>
@@ -105,9 +109,14 @@
                                         <div class="control">
                                             <div class="select">
                                                 <select name="role">
-                                                    <option value="{{ user.role._id }}" selected>{{ user.role.title }}</option>
-                                                    {{#if roles}}
-                                                        {{#each roles}}
+                                                    {{#if user.permissions}}
+                                                    <option value="{{ user.permissions._id }}" selected>{{ user.permissions.title }}</option>
+                                                    {{else}}
+                                                    <option selected disabled>Выбрать</option>
+                                                    {{/if}}
+
+                                                    {{#if permissions}}
+                                                        {{#each permissions}}
                                                             <option value="{{ _id }}">{{ title }}</option>
                                                         {{/each}}
                                                     {{/if}}
