@@ -111,7 +111,7 @@ app.use('/customers', customersRoutes)
 
 app.use(errorHandler)
 
-const PORT = process.env.PORT || 80
+const PORT = process.env.PORT || 3000
 
 async function start() {
     try {

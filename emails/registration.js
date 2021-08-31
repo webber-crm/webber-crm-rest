@@ -2,16 +2,17 @@
 
 const keys = require('../config')
 
-module.exports = function (email) {
+module.exports = function (email, name) {
     return {
         to: email,
         from: keys.EMAIL_FROM,
-        subject: 'Аккаунт создан',
+        subject: 'Webber CRM - Аккаунт создан',
         html: `
-            <h1>Добро пожаловать в наш магазин!</h1>
-            <p>Вы успешно создали аккаунт с email - ${email}</p>
+            <h1>Добро пожаловать в Webber CRM!</h1>
+            <p>${name}, вы успешно создали аккаунт.</p>
+            <p>Ваш E-mail в системе: ${email}</p>
             <hr />
-            <a href="${keys.BASE_URL}">Магазин курсов</a>
+            <a href="${keys.BASE_URL}">Перейти в систему</a>
         `
     }
 }

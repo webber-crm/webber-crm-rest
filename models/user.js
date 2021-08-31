@@ -9,6 +9,10 @@ const user = new Schema({
         type: String,
         required: true
     },
+    reset: {
+        token: String,
+        expires: Date
+    },
     name: {
         first: {
             type: String,

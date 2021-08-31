@@ -23,9 +23,11 @@ router.get('/', auth, async (req, res) => {
             const observers = t.roles.observers ? t.roles.observers.map(obj => obj._id) : [];
 
             // получаем список пользователей, которые имеют доступ к задаче (находятся внутри roles)
-            const users = [t.roles.author, t.roles.developer._id]
+            const users = [t.roles.author, ( t.roles.developer ? t.roles.developer._id : null )]
                 .concat(observers)
                 .map(item => item ? item.toString() : item)
+
+            console.log(users)
 
             // если текущий пользователь присутствует в списке пользователей задачи
             if (users.includes(req.session.user._id.toString())) {

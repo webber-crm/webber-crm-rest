@@ -1,0 +1,42 @@
+<div class="columns is-multiline" id="auth">
+    <div class="column is-4 is-offset-4 register">
+        <div class="columns">
+            <div class="column right">
+                <h1 class="title is-4 center">Забыли пароль?</h1>
+                <!--                    <p class="description">Укажите имя и E-mail, <br>доступ придёт Вам на почту.</p>-->
+                <form method="POST" action="/auth/reset">
+
+                    {{#if error}}
+                        <p class="help help-big is-danger">{{ error }}</p>
+                    {{/if}}
+
+                    <div class="field">
+                        <label class="label">E-mail</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input is-medium" :class="emailCheck" type="email" placeholder="Text input" name="email" v-model="email">
+                            <span class="icon is-small is-left">
+                              <i class="fas fa-user"></i>
+                            </span>
+                            <template v-if="email !== ''">
+                                <span class="icon is-small is-right" v-if="isValidateEmail">
+                                  <i class="fas fa-check"></i>
+                                </span>
+                                <span class="icon is-small is-right" v-else>
+                                  <i class="fas fa-exclamation-triangle"></i>
+                                </span>
+                            </template>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="_csrf" value="{{ csrf }}">
+                    <button type="submit" class="button is-block is-primary is-fullwidth is-medium">Сбросить пароль</button>
+                    <br/>
+                </form>
+
+                <div class="center">
+                    <a href="/auth/register">Регистрация</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
