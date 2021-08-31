@@ -12,13 +12,13 @@ const func = require('./func/functions')
 router.get('/', auth, async (req, res) => {
 
     const user = await User.findById(req.session.user._id).populate('job').populate('role')
-    const birthday = func.getFormattedDate(user.birthday)
+    const birthday = user.birthday ? func.getFormattedDate(user.birthday) : ""
 
     const rolesDB = await Roles.find()
-    const roles = rolesDB.filter(r => r._id.toString() !== user.role._id.toString())
+    const roles = user.role ? rolesDB.filter(r => r._id.toString() !== user.role._id.toString()) : ""
 
     const jobsDB = await Jobs.find()
-    const jobs = jobsDB.filter(f => f._id.toString() !== user.job._id.toString())
+    const jobs = user.job ? jobsDB.filter(f => f._id.toString() !== user.job._id.toString()) : ""
 
     res.render('profile', {
         title: 'Профиль',
