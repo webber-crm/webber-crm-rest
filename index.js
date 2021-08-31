@@ -5,6 +5,8 @@ const path = require('path')
 const csrf = require('csurf')
 const flash = require('connect-flash')
 const mongoose = require('mongoose')
+const helmet = require('helmet')
+const compression = require('compression')
 const exphbs = require('express-handlebars')
 const Handlebars = require('handlebars')
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
@@ -86,6 +88,9 @@ app.use(csrf())
     регистрируем Flash - обработка ошибок
  */
 app.use(flash())
+
+app.use(helmet({ contentSecurityPolicy: false }))
+app.use(compression())
 
 /*
  middleware для обработки файлов с POST-формы
