@@ -2,6 +2,8 @@ const {Router} = require('express') // аналог const express.Router = requi
 const User = require('../models/user')
 const {validationResult} = require('express-validator')
 const { registerValidators, loginValidators } = require('../utils/validators')
+const nodemailer = require('nodemailer') // подключаем общий пакет для отправки email
+const sendgrid = require('nodemailer-sendgrid-transport') // пакет email для сервиса sendgrid
 const bcrypt = require('bcryptjs')
 const router = Router()
 
