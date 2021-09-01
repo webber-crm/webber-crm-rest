@@ -80,12 +80,32 @@ exports.loginValidators = [
 ]
 
 exports.taskValidators = [
-    body(['name', 'body'], 'Название и тело задачи должно быть длинее 3 символов')
+    body('name', 'Название и тело задачи должно быть длинее 3 символов')
         .isLength({min: 3})
         .trim(),
     body(['customer', 'project'], 'Поля "Клиент" и "Проект" обязательны для заполнения')
         .isLength({min: 1})
-        .trim()
+        .trim(),
+    body('role', 'Произошла ошибка, попробуйте ещё раз')
+        .isLength({min: 1})
+        .custom((value, {req}) => {
+            if (value > 1) {
+                throw new Error('Произошла ошибка, попробуйте ещё раз')
+            }
+            return true
+        })
+]
+
+exports.taskEditValidators = [
+    ...this.taskValidators,
+    body('estimate', 'Поле оценки задачи должно быть заполнено')
+        .isLength({min: 1})
+        .custom((value, {req}) => {
+            if (req.body.role > 1 || !value) {
+                throw new Error('Произошла ошибка, попробуйте ещё раз')
+            }
+            return true
+        }),
 ]
 
 exports.customersValidators = [

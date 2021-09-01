@@ -7,7 +7,7 @@ const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
 const auth = require('../middleware/auth')
 const func = require('./func/functions')
-const { taskValidators } = require('../utils/validators')
+const { taskValidators, taskEditValidators } = require('../utils/validators')
 
 router.get('/', auth, async (req, res) => {
     /*
@@ -63,8 +63,8 @@ router.get('/add', auth, async (req, res) => {
     })
 })
 
-router.post('/edit', auth, taskValidators, async (req, res) => {
-    const {id} = req.body // забираем id из объекта req.body в переменную
+router.post('/edit', auth, taskEditValidators, async (req, res) => {
+    const {id, role} = req.body // забираем id из объекта req.body в переменную
 
     const errors = validationResult(req) // получаем ошибки валдации (если есть)
     if (!errors.isEmpty()) { // если переменная с ошибками не пуста
@@ -73,7 +73,8 @@ router.post('/edit', auth, taskValidators, async (req, res) => {
     }
 
     delete req.body.id // удаляем req.body.id, так как в MongoDB поле называется "_id", а в нашем запросе "id"
-    const body = {
+
+    const body = role === 0 ? {
         name: req.body.name,
         body: req.body.body,
         time: {
@@ -87,8 +88,10 @@ router.post('/edit', auth, taskValidators, async (req, res) => {
         },
         customer: req.body.customer,
         project: req.body.project
-    }
+    } : { time: { estimate: req.body.estimate, fact: req.body.fact } }
+
     await Task.findByIdAndUpdate(id, body)
+
     res.redirect('/tasks')
 })
 
@@ -131,6 +134,18 @@ router.get('/:id', auth, async (req, res) => {
         const usersFromObservers = await User.find({_id: {$in: observers}}) // пользовательские данные наблюдателей
         const usersFromRoles = {...task.roles.toObject(), observers: usersFromObservers } // пользовательские данные всех участников задачи по ролям
 
+        switch(user._id.toString()) {
+            case task.roles.author._id.toString():
+                user.role = 0;
+                break;
+            case task.roles.developer._id.toString():
+                user.role = 1
+                break;
+            default:
+                user.role = 2
+                break;
+        }
+
         // получаем массив с объектами пользователей, где к каждому объекту добавлено свойство selected (выбран разработчик задачи)
         users.dev = func.getFilteredSelectList(users, usersFromRoles.developer)
 
@@ -146,6 +161,7 @@ router.get('/:id', auth, async (req, res) => {
                 roles: usersFromRoles,
                 users,
                 customers,
+                user,
                 error: req.flash('error')
             })
         } else {

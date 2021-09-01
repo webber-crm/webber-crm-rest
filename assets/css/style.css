@@ -24,6 +24,11 @@
   padding-top: 120px;
 }
 
+select[data-disabled] {
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
 .switch {
   position: relative;
   display: inline-block;
