@@ -19,9 +19,9 @@ exports.registerValidators = [
             }
         })
         .normalizeEmail(), // санитайзер, нормализует Email
-    body('password', 'Пароль должен быть минимум 8 символов')
-        .isLength({min: 8, max: 32})
-        .isAlphanumeric()
+    body('password')
+        .isLength({min: 8, max: 32}).withMessage('Пароль должен быть минимум 8 символов')
+        .isAlphanumeric().withMessage('Пароль может включать в себя буквы и цифры')
         .trim(), // санитайзер trim, удаляет пробелы по краям
     body('confirm').custom((value, {req}) => {
             if (value !== req.body.password) {
