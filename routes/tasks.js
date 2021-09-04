@@ -9,6 +9,29 @@ const auth = require('../middleware/auth')
 const func = require('./func/functions')
 const { taskValidators, taskEditValidators } = require('../utils/validators')
 
+function getTaskPrices(task) {
+    const price = {
+        customer: task.customer && task.customer.price ? task.customer.price : 0,
+        developer: task.roles.developer && task.roles.developer.price ? task.roles.developer.price : 0
+    }
+
+    const result = { customer: 0, developer: 0 }
+
+    // если определён разработчик по задаче
+    if (price) {
+        if (price.customer) {
+            // рассчитываем стоимость выполнения задачи
+            result.customer = task.time.estimate * price.customer
+        }
+
+        if (price.developer) {
+            result.developer = task.time.estimate * price.developer
+        }
+    }
+
+    return result
+}
+
 router.get('/', auth, async (req, res) => {
     /*
         рендерим шаблон Handlebars:
@@ -34,12 +57,7 @@ router.get('/', auth, async (req, res) => {
             }
         }
     }).map(t => {
-        // если определён разработчик по задаче
-        if (t.roles.developer && t.roles.developer.price) {
-            // рассчитываем стоимость выполнения задачи
-            t.price = t.time.estimate * t.roles.developer.price
-        }
-
+        t.price = getTaskPrices(t)
         return t
     })
 
@@ -122,6 +140,7 @@ router.get('/:id', auth, async (req, res) => {
     const users = await User.find() // получаем всех пользователей
     const customers = await func.getFilteredArrayFromDB(Customer, task.customer, user.customers)
 
+    task.price = getTaskPrices(task)
     const observers = roles.roles.observers ? roles.roles.observers.map(obj => obj._id) : []
 
     // список ID всех участников задачи (независимо от роли)

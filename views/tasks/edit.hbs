@@ -115,6 +115,24 @@
                         </div>
                     </div>
 
+                    {{#morethan user.role 0}}
+                        <div class="field-body field-body-not-last">
+                            <div class="field">
+                                <label class="label">Цена для клиента</label>
+                                <div class="control">
+                                    <input class="input" type="text" value="{{ task.price.customer }}" readonly>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Стоимость реализации</label>
+                                <div class="control">
+                                    <input class="input" type="text" value="{{ task.price.developer }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    {{/morethan}}
+
                     <input type="hidden" name="id" value="{{task.id}}">
                     <input type="hidden" name="role" value="{{ user.role }}">
 

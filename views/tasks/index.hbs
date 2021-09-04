@@ -54,7 +54,7 @@
                     </a>
                 </td>
                 <td>{{time.estimate}}</td>
-                <td>{{price}}</td>
+                <td>{{#if price.customer}}{{ price.customer }}{{else}}{{ price.developer }}{{/if}}</td>
                 <!--<td>
                     <span class="tag is-info">Редактировать</span>
                     <span class="tag is-danger">Удалить</span>
