@@ -48,10 +48,9 @@
                                     <div class="control">
                                         <div class="select">
                                             <select name="service">
-                                                <option value="{{ customer.service._id }}" selected>{{ customer.service.title }}</option>
                                                 {{#if services}}
                                                     {{#each services}}
-                                                        <option value="{{ _id }}">{{ title }}</option>
+                                                        <option value="{{ _id }}" {{#if selected}}selected{{/if}}>{{ title }}</option>
                                                     {{/each}}
                                                 {{/if}}
                                             </select>

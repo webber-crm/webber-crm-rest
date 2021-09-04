@@ -17,6 +17,12 @@ router.get('/', auth, async (req, res) => {
     const permissions = await func.getFilteredSelectListFromDB(Permissions, user.permissions)
     const jobs = await func.getFilteredSelectListFromDB(Jobs, user.job)
 
+    // удаляем из списка должность с idx 0 в случае, если права доступа !== 0
+
+    if (req.session.perm !== 0) {
+        delete jobs[jobs.findIndex(job => job.idx === 0)]
+    }
+
     res.render('profile', {
         title: 'Профиль',
         user,

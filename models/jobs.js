@@ -4,6 +4,11 @@ const job = new Schema({
     title: {
         type: String,
         required: true
+    },
+    idx: {
+        type: Number,
+        required: true,
+        unique: true
     }
 })
 

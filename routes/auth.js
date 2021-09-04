@@ -61,7 +61,7 @@ router.post('/login', loginValidators, async (req, res) => {
 
     const { email, password } = req.body
     const user = await User.findOne({ email }).populate('permissions')
-    const permissions = user.permissions ? user.permissions.idx : null
+    const permissions = user.permissions ? user.permissions.idx : -1
 
     if (req.body.password) {
         const isEqual = await bcrypt.compare(password, user.password)
