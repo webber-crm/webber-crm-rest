@@ -24,7 +24,7 @@ const task = new Schema({
           type: Date,
           default: Date.now
         },
-        modified: Date
+        updated: Date
     },
     roles: {
         author: {
@@ -64,6 +64,10 @@ const task = new Schema({
     active: {
         type: Boolean,
         default: true
+    },
+    status: {
+        type: Schema.Types.ObjectId,
+        ref: 'Status'
     }
 })
 

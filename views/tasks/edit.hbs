@@ -115,7 +115,7 @@
                         </div>
                     </div>
 
-                    {{#morethan user.role 0}}
+                    {{#lessthan user.role 1}}
                         <div class="field-body field-body-not-last">
                             <div class="field">
                                 <label class="label">Цена для клиента</label>
@@ -131,7 +131,24 @@
                                 </div>
                             </div>
                         </div>
-                    {{/morethan}}
+                    {{/lessthan}}
+
+                    {{#lessthan user.role 2}}
+                        <div class="field">
+                            <label class="label">Статус задачи</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select name="status" {{#morethan user.role 1}}data-disabled{{/morethan}}>
+                                        {{#if status}}
+                                            {{#each status}}
+                                                <option value="{{ _id }}" {{#if selected}}selected{{/if}}>{{ title }}</option>
+                                            {{/each}}
+                                        {{/if}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    {{/lessthan}}
 
                     <input type="hidden" name="id" value="{{task.id}}">
                     <input type="hidden" name="role" value="{{ user.role }}">

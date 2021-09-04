@@ -86,18 +86,18 @@ exports.taskValidators = [
     body(['customer', 'project'], 'Поля "Клиент" и "Проект" обязательны для заполнения')
         .isLength({min: 1})
         .trim(),
-    body('role', 'Произошла ошибка, попробуйте ещё раз')
-        .isLength({min: 1})
+]
+
+exports.taskEditValidators = [
+    ...this.taskValidators,
+    body('role')
+        .isLength({min: 1}).withMessage('Произошла ошибка, попробуйте ещё раз')
         .custom((value, {req}) => {
             if (value > 1) {
                 throw new Error('Произошла ошибка, попробуйте ещё раз')
             }
             return true
-        })
-]
-
-exports.taskEditValidators = [
-    ...this.taskValidators,
+        }),
     body('estimate', 'Поле оценки задачи должно быть заполнено')
         .isLength({min: 1})
         .custom((value, {req}) => {

@@ -2,6 +2,7 @@ const {Router} = require('express') // аналог const express.Router = requi
 const Task = require('../models/task')
 const User = require('../models/user')
 const Customer = require('../models/customer')
+const Status = require('../models/status')
 const {validationResult} = require('express-validator')
 const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
@@ -83,33 +84,25 @@ router.get('/add', auth, async (req, res) => {
 
 router.post('/edit', auth, taskEditValidators, async (req, res) => {
     const {id, role} = req.body // забираем id из объекта req.body в переменную
+    delete req.body.id // удаляем req.body.id, так как в MongoDB поле называется "_id", а в нашем запросе "id"
 
-    const errors = validationResult(req) // получаем ошибки валдации (если есть)
+    const errors = validationResult(req) // получаем ошибки валидации (если есть)
     if (!errors.isEmpty()) { // если переменная с ошибками не пуста
         req.flash('error', errors.array()[0].msg)
         return res.status(422).redirect(`/tasks/${id}`)
     }
 
-    delete req.body.id // удаляем req.body.id, так как в MongoDB поле называется "_id", а в нашем запросе "id"
+    const task = await Task.findById(id)
+    const keys = Object.keys(req.body)
 
-    const body = role === 0 ? {
-        name: req.body.name,
-        body: req.body.body,
-        time: {
-            estimate: req.body.estimate,
-            fact: req.body.fact
-        },
-        roles: {
-            author: req.body.author,
-            developer: req.body.developer,
-            observers: req.body.observers
-        },
-        customer: req.body.customer,
-        project: req.body.project
-    } : { time: { estimate: req.body.estimate, fact: req.body.fact } }
+    keys.forEach(k => {
+        task[k] = req.body[k]
+    })
+    task.states.updated = Date.now()
+
+    const body = +role === 0 ? task : { time: { estimate: req.body.estimate, fact: req.body.fact } }
 
     await Task.findByIdAndUpdate(id, body)
-
     res.redirect('/tasks')
 })
 
@@ -136,9 +129,10 @@ router.get('/:id', auth, async (req, res) => {
         return set404Error()
     }
 
-    const task = await Task.findById(req.params.id).populate('roles.author').populate('roles.developer').populate('customer')
+    const task = await Task.findById(req.params.id).populate('roles.author').populate('roles.developer').populate('customer').populate('status')
     const users = await User.find() // получаем всех пользователей
     const customers = await func.getFilteredArrayFromDB(Customer, task.customer, user.customers)
+    const status = await func.getFilteredSelectListFromDB(Status, task.status)
 
     task.price = getTaskPrices(task)
     const observers = roles.roles.observers ? roles.roles.observers.map(obj => obj._id) : []
@@ -181,6 +175,7 @@ router.get('/:id', auth, async (req, res) => {
                 users,
                 customers,
                 user,
+                status,
                 error: req.flash('error')
             })
         } else {
@@ -231,6 +226,7 @@ router.post('/add', auth, taskValidators, async (req, res) => {
     }
 
     const tasks = await Task.find()
+    const status = await Status.findOne({idx: 1})
 
     const observersFromBody = req.body.observers
     const observers = observersFromBody && Array.isArray(observersFromBody) ?
@@ -248,7 +244,8 @@ router.post('/add', auth, taskValidators, async (req, res) => {
             observers
         },
         customer: req.body.customer,
-        project: req.body.project
+        project: req.body.project,
+        status: ObjectId(status._id)
     })
 
     try {
