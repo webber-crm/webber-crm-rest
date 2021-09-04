@@ -9,7 +9,9 @@ const pageSingleCustomer = new Vue({
         avatarSrc: "https://bulma.io/images/placeholders/128x128.png",
         tab: null,
         domain: "demo.com",
-        domains: []
+        domains: [],
+        showSaveBtn: true,
+        setDeleteState: false
     },
     methods: {
         addTag(e) {
@@ -57,6 +59,9 @@ const pageSingleCustomer = new Vue({
                     this.domain = ""
                 }
             }
+        },
+        noSaveSwitcher(flag) {
+            this.showSaveBtn = flag
         }
     },
     computed: {

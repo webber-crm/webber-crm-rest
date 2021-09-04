@@ -11,10 +11,10 @@
                     <div class="tabs-with-content">
                         <div class="tabs">
                             <ul>
-                                <li><a>Общее</a></li>
-                                <li><a>Аккаунт</a></li>
-                                <li><a>Настройки</a></li>
-                                <li><a>Аватар</a></li>
+                                <li @click="noSaveSwitcher(true)"><a>Общее</a></li>
+                                <li @click="noSaveSwitcher(true)"><a>Аккаунт</a></li>
+                                <li @click="noSaveSwitcher(false)"><a>Настройки</a></li>
+                                <li @click="noSaveSwitcher(true)"><a>Аватар</a></li>
                             </ul>
                         </div>
                         <div>
@@ -129,7 +129,19 @@
                                     </div>
                                 </div>
                             </section>
-                            <section class="tab-content">Раздел в разработке.</section>
+                            <section class="tab-content">
+                                <template v-if="!setDeleteState">
+                                    <button class="button is-danger" @click="setDeleteState = true">Удалить аккаунт</button>
+                                </template>
+
+                                <template v-else>
+                                    <form action="/profile/delete" method="POST">
+                                        <input type="hidden" name="_csrf" value="{{ csrf }}">
+                                        <button type="submit" class="button is-danger">Подтвердить удаление</button>
+                                        <button type="button" class="button is-success" @click="setDeleteState = false">Оставить аккаунт</button>
+                                    </form>
+                                </template>
+                            </section>
                             <section class="tab-content">
                                 <div class="avatar">
                                     <figure class="image img-object box-image">
@@ -162,9 +174,8 @@
                         </div>
                     </div>
 
-                    <div class="field is-grouped">
+                    <div class="field is-grouped" v-if="showSaveBtn">
                         <div class="control">
-
                             <button class="button is-link">Сохранить</button>
                         </div>
                     </div>

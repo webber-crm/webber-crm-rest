@@ -5,9 +5,25 @@ const Permissions = require('../models/permissions')
 const ObjectId = require('mongoose').Types.ObjectId
 const {validationResult} = require('express-validator')
 const { profileValidators } = require('../utils/validators')
+const nodemailer = require('nodemailer') // подключаем общий пакет для отправки email
+const sendgrid = require('nodemailer-sendgrid-transport') // пакет email для сервиса sendgrid
+const keys = require('../config')
+const deleteEmail = require('../emails/delete')
 const router = Router()
 const auth = require('../middleware/auth')
 const func = require('./func/functions')
+
+/*
+    создаём transporter для sendgrid
+
+    в метод createTransport передаём функцию из пакета "nodemailer-sendgrid-transport"
+    внутри функции sendrid передаём объект конфигурации
+ */
+const transporter = nodemailer.createTransport(sendgrid({
+    auth: {
+        api_key: keys.SENDGRID_API_KEY // передаём ключ API, полученный в Sendgrid
+    }
+}))
 
 router.get('/', auth, async (req, res) => {
 
@@ -75,6 +91,24 @@ router.post('/', auth, profileValidators, async (req, res) => {
 
     await User.findByIdAndUpdate(id, data)
     res.redirect('/profile')
+})
+
+router.post('/delete', auth, async (req, res) => {
+
+    const { _id, email } = req.session.user
+    await User.findByIdAndDelete(_id)
+
+    // очищаем сессию
+    req.session.destroy(async () => {
+        // callback-функция может использоваться для удаления сессии из MongoDB
+        res.redirect('/auth/login')
+
+        /*
+            отправляем письмо через метод sendMail() у transporter
+            отправку письма рекомендуется делать после редиректов, чтобы не наблюдать задержек
+         */
+        await transporter.sendMail(deleteEmail(email))
+    })
 })
 
 module.exports = router
