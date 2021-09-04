@@ -29,7 +29,7 @@ router.get('/', auth, async (req, res) => {
     const active = tasks.filter(task => task.status.idx === 2)
     const estimate = tasks.filter(task => task.status.idx === 1)
 
-    const count = { active: active.length, estimate: estimate.length, customers: customers.length }
+    const count = { active: active.length, estimate: estimate.length, total: tasks.length, customers: customers.length }
 
     res.render('index', {
         layout: 'main',
