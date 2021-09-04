@@ -64,6 +64,7 @@
                         <a class="fas fa-pen" href="/tasks/{{id}}"></a>
                     </span>
 
+                {{#ifeq userrole 0}}
                 {{#if active}}
                     <span class="icon icon-action icon-disable">
                         <a class="fas fa-toggle-on" href="/tasks/{{id}}/turn-off"></a>
@@ -77,6 +78,7 @@
                     <span class="icon icon-action icon-delete">
                         <a class="fas fa-trash-alt" href="/tasks/{{id}}/delete"></a>
                     </span>
+                {{/ifeq}}
                 </td>
             </tr>
             {{/each}}

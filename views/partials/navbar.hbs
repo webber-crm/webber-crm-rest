@@ -26,9 +26,11 @@
                     Клиенты
                 </a>
 
+                {{#lessthan perm 2}}
                 <a class="navbar-item" href="/payments">
                     Оплаты
                 </a>
+                {{/lessthan}}
 
                 <!--
                 <div class="navbar-item has-dropdown is-hoverable">

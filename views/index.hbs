@@ -8,8 +8,8 @@
             <div class="tile">
                 <div class="tile is-parent is-vertical">
                     <article class="tile is-child notification is-primary">
-                        <p class="title"><a href="/tasks">Задачи</a></p>
-                        <p class="subtitle">3 в процессе</p>
+                        <p class="title"><a href="{{#if count.active}}/tasks?status=2{{else}}/tasks{{/if}}">Задачи</a></p>
+                        <p class="subtitle">{{ count.active }} в процессе</p>
                     </article>
                     <article class="tile is-child notification is-warning">
                         <p class="title">Оплаты</p>
@@ -18,15 +18,15 @@
                 </div>
                 <div class="tile is-parent">
                     <article class="tile is-child notification is-info">
-                        <p class="title">Задачи на оценку</p>
-                        <p class="subtitle">2 новых задачи</p>
+                        <p class="title"><a href="{{#if count.active}}/tasks?status=1{{else}}/tasks{{/if}}">Задачи на оценку</a></p>
+                        <p class="subtitle">{{ count.estimate }} ждут оценки разработчика</p>
                     </article>
                 </div>
             </div>
             <div class="tile is-parent">
                 <article class="tile is-child notification is-danger">
-                    <p class="title">Клиенты</p>
-                    <p class="subtitle">1 новая заявка</p>
+                    <p class="title">{{#if count.customers }}<a href="/customers">Клиенты</a>{{else}}Клиенты{{/if}}</p>
+                    <p class="subtitle">Количество клиентов: {{ count.customers }}</p>
                 </article>
             </div>
         </div>

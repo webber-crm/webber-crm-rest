@@ -63,8 +63,8 @@
                         <div class="field">
                             <label class="label">Автор задачи</label>
                             <div class="control">
-                                <input class="input" type="text" value="{{ roles.author.name.first }} {{ roles.author.name.last }}" readonly>
-                                <input type="hidden" name="author" value="{{ roles.author._id }}" required>
+                                <input class="input" type="text" value="{{ task.roles.author.name.first }} {{ task.roles.author.name.last }}" readonly>
+                                <input type="hidden" name="author" value="{{ task.roles.author._id }}" required>
                             </div>
                         </div>
 

@@ -33,6 +33,24 @@ function getTaskPrices(task) {
     return result
 }
 
+function getUserRoleInTheTask(user, task) {
+    let role;
+
+    switch(user._id.toString()) {
+        case task.roles.author._id.toString():
+            role = 0;
+            break;
+        case task.roles.developer._id.toString():
+            role = 1
+            break;
+        default:
+            role = 2
+            break;
+    }
+
+    return role
+}
+
 router.get('/', auth, async (req, res) => {
     /*
         рендерим шаблон Handlebars:
@@ -40,26 +58,17 @@ router.get('/', auth, async (req, res) => {
         2 параметр - объект с любыми нужными нам опциями. Например, передадим мета-title
     */
 
-    const data = await Task.find().populate('roles.developer').populate('customer')
+    const { user } = req.session
+    const status = req.query.status ? await Status.findOne({idx: +req.query.status}) : null
+    const find = req.query.status ? {status: {$in: status._id}} : {}
+    const data = await Task.find({$or: [{'roles.observers': {$in: [user._id]}}, {'roles.developer': user._id}, {'roles.author': user._id}], ...find}).populate('roles.developer').populate('customer')
 
-    const tasks = data.filter(t => {
-        if (t.roles) {
-            // получаем список наблюдателей внутри roles (observers)
-            const observers = t.roles.observers ? t.roles.observers.map(obj => obj._id) : [];
+    const tasks = data.map((task, idx) => {
+        task.idx = idx + 1
+        task.price = getTaskPrices(task)
+        task.userrole = getUserRoleInTheTask(user, task)
 
-            // получаем список пользователей, которые имеют доступ к задаче (находятся внутри roles)
-            const users = [t.roles.author, ( t.roles.developer ? t.roles.developer._id : null )]
-                .concat(observers)
-                .map(item => item ? item.toString() : item)
-
-            // если текущий пользователь присутствует в списке пользователей задачи
-            if (users.includes(req.session.user._id.toString())) {
-                return t
-            }
-        }
-    }).map(t => {
-        t.price = getTaskPrices(t)
-        return t
+        return task
     })
 
     res.render('tasks', {
@@ -99,6 +108,8 @@ router.post('/edit', auth, taskEditValidators, async (req, res) => {
         task[k] = req.body[k]
     })
     task.states.updated = Date.now()
+    task.roles.developer = req.body.developer
+    task.roles.observers = req.body.observers
 
     const body = +role === 0 ? task : { time: { estimate: req.body.estimate, fact: req.body.fact } }
 
@@ -147,17 +158,7 @@ router.get('/:id', auth, async (req, res) => {
         const usersFromObservers = await User.find({_id: {$in: observers}}) // пользовательские данные наблюдателей
         const usersFromRoles = {...task.roles.toObject(), observers: usersFromObservers } // пользовательские данные всех участников задачи по ролям
 
-        switch(user._id.toString()) {
-            case task.roles.author._id.toString():
-                user.role = 0;
-                break;
-            case task.roles.developer._id.toString():
-                user.role = 1
-                break;
-            default:
-                user.role = 2
-                break;
-        }
+        user.role = getUserRoleInTheTask(user, task)
 
         // получаем массив с объектами пользователей, где к каждому объекту добавлено свойство selected (выбран разработчик задачи)
         users.dev = func.getFilteredSelectList(users, usersFromRoles.developer)
@@ -227,17 +228,12 @@ router.post('/add', auth, taskValidators, async (req, res) => {
 
     const tasks = await Task.find()
     const status = await Status.findOne({idx: 1})
-
-    const observersFromBody = req.body.observers
-    const observers = observersFromBody && Array.isArray(observersFromBody) ?
-        observersFromBody.map(item => ObjectId(item) ) :
-        [ ObjectId(observersFromBody) ]
+    const { observers } = req.body
 
     const task = new Task({
         name: req.body.name,
         body: req.body.body,
         time: {estimate: req.body.estimate, fact: req.body.fact},
-        idx: tasks.length + 1,
         roles: {
             author: ObjectId(req.session.user._id),
             developer: ObjectId(req.body.developer),
