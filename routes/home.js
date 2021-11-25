@@ -31,12 +31,7 @@ router.get('/', auth, async (req, res) => {
 
     const count = { active: active.length, estimate: estimate.length, total: tasks.length, customers: customers.length }
 
-    res.render('index', {
-        layout: 'main',
-        title: 'Главная страница',
-        count,
-        isHome: true
-    })
+    res.json(count)
 })
 
 module.exports = router

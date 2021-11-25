@@ -19,24 +19,10 @@ router.get('/', auth, async (req, res) => {
         customer.info.date = func.getFormattedDate(customer.info.dateFrom)
     })
 
-    res.render('customers', {
-        title: 'Клиенты',
-        isCustomers: true,
-        customers
-    })
+    res.json(customers)
 })
 
-router.get('/add', auth, async (req, res) => {
-    const services = await Service.find()
-
-    res.render('customers/add', {
-        title: 'Новый клиент',
-        services,
-        error: req.flash('error')
-    })
-})
-
-router.post('/add', auth, customersValidators, async (req, res) => {
+router.post('/', auth, customersValidators, async (req, res) => {
 
     const data = req.body
 
@@ -64,14 +50,14 @@ router.post('/add', auth, customersValidators, async (req, res) => {
     const customer = new Customer(data)
 
     try {
-        await customer.save() // вызываем метод класса Task для сохранения в БД
+        const current = await customer.save() // вызываем метод класса Task для сохранения в БД
 
         const user = await User.findByIdAndUpdate(req.session.user._id)
         user.customers = user.customers.concat([customer._id])
         await user.save()
 
         // делаем редирект после отправки формы
-        res.redirect('/customers')
+        res.json(current)
     } catch (e) {
         console.log(e)
         res.end()
@@ -81,21 +67,12 @@ router.post('/add', auth, customersValidators, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
 
     const customer = await Customer.findById(req.params.id).populate('service')
-    const services = await func.getFilteredSelectListFromDB(Service, customer.service)
-    const date = func.getFormattedDate(customer.info.dateFrom)
-
     customer.projects = JSON.stringify(customer.projects)
 
-    res.render('customers/edit', {
-        title: 'Редактирование карточки клиента',
-        customer,
-        services,
-        date,
-        error: req.flash('error')
-    })
+    res.json(customer)
 })
 
-router.post('/edit', auth, customersValidators, async (req, res) => {
+router.put('/:id', auth, customersValidators, async (req, res) => {
     const {id} = req.body // забираем id из объекта req.body в переменную
 
     const errors = validationResult(req) // получаем ошибки валдации (если есть)
@@ -119,27 +96,18 @@ router.post('/edit', auth, customersValidators, async (req, res) => {
         }
     }
 
-    await Customer.findByIdAndUpdate(id, data)
-    res.redirect('/customers')
+    const current = await Customer.findByIdAndUpdate(id, data)
+    res.json(current)
 })
 
-router.get('/:id/delete', auth, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     await Customer.findByIdAndRemove(req.params.id)
 
     const user = await User.findById(req.session.user._id)
     user.customers = user.customers.filter(c => c.toString() !== req.params.id.toString())
     await user.save()
 
-    res.redirect('/customers')
-})
-
-router.get('/api/:id', async (req, res) => {
-    const filed = req.query.field || ''
-    const customer = await Customer.findById(req.params.id, filed)
-
-    if (customer) {
-        res.status(200).send(JSON.stringify(customer))
-    }
+    res.status(204).json({})
 })
 
 module.exports = router

@@ -15,6 +15,5 @@ module.exports = function(req, res, next) {
         добавляем токен CSRF в объект ответа,
         чтобы токен был доступен в каждом шаблоне .hbs
      */
-    res.locals.csrf = req.csrfToken()
     next()
 }

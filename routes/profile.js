@@ -39,21 +39,18 @@ router.get('/', auth, async (req, res) => {
         delete jobs[jobs.findIndex(job => job.idx === 0)]
     }
 
-    res.render('profile', {
-        title: 'Профиль',
+    res.json({
         user,
         birthday,
         jobs,
         permissions,
-        error: req.flash('error')
     })
 })
 
 router.post('/', auth, profileValidators, async (req, res) => {
     const errors = validationResult(req) // получаем ошибки валдации (если есть)
     if (!errors.isEmpty()) { // если переменная с ошибками не пуста
-        req.flash('error', errors.array()[0].msg)
-        return res.status(422).redirect('/profile')
+        return res.status(422).json({msg: errors.array()[0].msg})
     }
 
     const id = req.session.user._id
@@ -89,19 +86,21 @@ router.post('/', auth, profileValidators, async (req, res) => {
         }
     }
 
-    await User.findByIdAndUpdate(id, data)
-    res.redirect('/profile')
+    const current = await User.findByIdAndUpdate(id, data)
+    res.json(current)
 })
 
-router.post('/delete', auth, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
 
-    const { _id, email } = req.session.user
-    await User.findByIdAndDelete(_id)
+    const { id } = req.params.id
+    const { email } = req.session.user
+
+    await User.findByIdAndDelete(id)
 
     // очищаем сессию
     req.session.destroy(async () => {
         // callback-функция может использоваться для удаления сессии из MongoDB
-        res.redirect('/auth/login')
+        res.status(204).json({})
 
         /*
             отправляем письмо через метод sendMail() у transporter

@@ -1,13 +1,10 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
 const Task = require('../models/task')
-const User = require('../models/user')
-const Customer = require('../models/customer')
 const Status = require('../models/status')
 const {validationResult} = require('express-validator')
 const ObjectId = require('mongoose').Types.ObjectId
 const router = Router()
 const auth = require('../middleware/auth')
-const func = require('./func/functions')
 const { taskValidators, taskEditValidators } = require('../utils/validators')
 
 function getTaskPrices(task) {
@@ -63,42 +60,23 @@ router.get('/', auth, async (req, res) => {
     const find = req.query.status ? {status: {$in: status._id}} : {}
     const data = await Task.find({$or: [{'roles.observers': {$in: [user._id]}}, {'roles.developer': user._id}, {'roles.author': user._id}], ...find}).populate('roles.developer').populate('customer')
 
-    const tasks = data.map((task, idx) => {
-        task.idx = idx + 1
+    const tasks = data.map((task) => {
         task.price = getTaskPrices(task)
         task.userrole = getUserRoleInTheTask(user, task)
 
         return task
     })
 
-    res.render('tasks', {
-        title: 'Задачи',
-        isTasks: true,
-        tasks
-    })
+    res.json(tasks)
 })
 
-router.get('/add', auth, async (req, res) => {
-    const user = await User.findById(req.session.user._id)
-
-    const users = await User.find()
-    const customers = await Customer.find({_id: {$in: user.customers}})
-
-    res.render('tasks/add', {
-        title: 'Новая задача',
-        users,
-        customers
-    })
-})
-
-router.post('/edit', auth, taskEditValidators, async (req, res) => {
+router.put('/:id', auth, taskEditValidators, async (req, res) => {
     const {id, role} = req.body // забираем id из объекта req.body в переменную
     delete req.body.id // удаляем req.body.id, так как в MongoDB поле называется "_id", а в нашем запросе "id"
 
     const errors = validationResult(req) // получаем ошибки валидации (если есть)
     if (!errors.isEmpty()) { // если переменная с ошибками не пуста
-        req.flash('error', errors.array()[0].msg)
-        return res.status(422).redirect(`/tasks/${id}`)
+        return res.status(422).json({msg: errors.array()[0].msg})
     }
 
     const task = await Task.findById(id)
@@ -113,8 +91,8 @@ router.post('/edit', auth, taskEditValidators, async (req, res) => {
 
     const body = +role === 0 ? task : { time: { estimate: req.body.estimate, fact: req.body.fact } }
 
-    await Task.findByIdAndUpdate(id, body)
-    res.redirect('/tasks')
+    const current = await Task.findByIdAndUpdate(id, body)
+    res.json(current)
 })
 
 router.get('/:id', auth, async (req, res) => {
@@ -122,111 +100,25 @@ router.get('/:id', auth, async (req, res) => {
         req.params.id - получаем значение /:id
         course - получаем объект с курсом
      */
-
-    function set404Error() {
-        res.status(404).render('tasks/error', {
-            title: 'Ошибка 404: Задача не найдена', // устанавливаем мета-title
-        })
-    }
-
-    if (!ObjectId.isValid(req.params.id)) {
-        return set404Error()
-    }
-
-    const user = await User.findById(req.session.user._id) // текущий пользователь из сессии
-    const roles = await Task.findById(req.params.id, 'roles')
-
-    if (!roles) {
-        return set404Error()
-    }
-
     const task = await Task.findById(req.params.id).populate('roles.author').populate('roles.developer').populate('customer').populate('status')
-    const users = await User.find() // получаем всех пользователей
-    const customers = await func.getFilteredArrayFromDB(Customer, task.customer, user.customers)
-    const status = await func.getFilteredSelectListFromDB(Status, task.status)
 
-    task.price = getTaskPrices(task)
-    const observers = roles.roles.observers ? roles.roles.observers.map(obj => obj._id) : []
-
-    // список ID всех участников задачи (независимо от роли)
-    const members = Object.values(roles.roles)
-        .filter(i => typeof i === 'object' && !Array.isArray(i))
-        .concat(observers)
-
-    if (roles) {
-        const membersToString = members.map(v => v ? v.toString() : []) // массив members, но элементы преобразованы в строку
-        const usersFromObservers = await User.find({_id: {$in: observers}}) // пользовательские данные наблюдателей
-        const usersFromRoles = {...task.roles.toObject(), observers: usersFromObservers } // пользовательские данные всех участников задачи по ролям
-
-        user.role = getUserRoleInTheTask(user, task)
-
-        // получаем массив с объектами пользователей, где к каждому объекту добавлено свойство selected (выбран разработчик задачи)
-        users.dev = func.getFilteredSelectList(users, usersFromRoles.developer)
-
-        // массив с объектами пользователями, где в объектах отмечены наблюдатели (через свойство selected)
-        users.observers = func.getFilteredSelectList(users, observers)
-
-        // если текущий пользователь присутствует в списке пользователей задачи
-        if (membersToString.includes(req.session.user._id.toString())) {
-
-            res.render('tasks/edit', {
-                title: `Задача #${task._id}`, // устанавливаем мета-title
-                task, // передаём объект задачи
-                roles: usersFromRoles,
-                users,
-                customers,
-                user,
-                status,
-                error: req.flash('error')
-            })
-        } else {
-            res.status(403).render('tasks/forbidden', {
-                title: 'Доступ запрещён', // устанавливаем мета-title
-                layout: 'empty'
-            })
-        }
-    }
+    res.json(task);
 })
 
-router.get('/:id/delete', auth, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     await Task.findByIdAndRemove(req.params.id)
-    res.redirect('/tasks')
+    res.status(204).json({});
 })
 
-router.get('/:id/turn-off', auth, async (req, res) => {
-    await Task.findByIdAndUpdate(req.params.id, {active: false})
-    res.redirect('/tasks')
-})
-
-router.get('/:id/turn-on', auth, async (req, res) => {
-    await Task.findByIdAndUpdate(req.params.id, {active: true})
-    res.redirect('/tasks')
-})
-
-router.post('/add', auth, taskValidators, async (req, res) => {
+router.post('/', auth, taskValidators, async (req, res) => {
     const errors = validationResult(req) // получаем ошибки валдации (если есть)
     if (!errors.isEmpty()) { // если переменная с ошибками не пуста
-        const {name, body} = req.body
-        const user = await User.findById(req.session.user._id)
 
-        const users = await User.find()
-        const customers = await Customer.find({_id: {$in: user.customers}})
-
-        req.flash('error', errors.array()[0].msg)
-
-        return res.status(422).render('tasks/add', {
-            title: 'Новая задача', // устанавливаем мета-title
-            error: req.flash('error'),
-            users,
-            customers,
-            data: {
-                name,
-                body
-            }
+        return res.status(422).json({
+            msg: errors.array()[0].msg,
         })
     }
 
-    const tasks = await Task.find()
     const status = await Status.findOne({idx: 1})
     const { observers } = req.body
 
@@ -245,10 +137,9 @@ router.post('/add', auth, taskValidators, async (req, res) => {
     })
 
     try {
-        await task.save() // вызываем метод класса Task для сохранения в БД
+        const current = await task.save() // вызываем метод класса Task для сохранения в БД
 
-        // делаем редирект после отправки формы
-        res.redirect('/tasks')
+        res.status(201).json(current)
     } catch (e) {
         console.log(e)
         res.end()

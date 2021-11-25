@@ -26,37 +26,11 @@ const transporter = nodemailer.createTransport(sendgrid({
     }
 }))
 
-router.get('/login', async (req, res) => {
-
-    if (!req.session.user) {
-        res.render('auth/login', {
-            title: 'Авторизация - Вход',
-            layout: 'main',
-            error: req.flash('error')
-        })
-    } else {
-        res.redirect('/')
-    }
-})
-
-router.get('/register', async (req, res) => {
-
-    if (!req.session.user) {
-        res.render('auth/register', {
-            title: 'Регистрация',
-            layout: 'main',
-            error: req.flash('error')
-        })
-    } else {
-        res.redirect('/')
-    }
-})
-
 router.post('/login', loginValidators, async (req, res) => {
     const errors = validationResult(req) // получаем ошибки валдации (если есть)
+
     if (!errors.isEmpty()) { // если переменная с ошибками не пуста
-        req.flash('error', errors.array()[0].msg)
-        return res.status(422).redirect('/auth/login')
+        return res.status(401).json({msg: errors.array()[0].msg})
     }
 
     const { email, password } = req.body
@@ -79,7 +53,9 @@ router.post('/login', loginValidators, async (req, res) => {
                 if (err) {
                     throw err
                 }
-                res.redirect('/')
+
+                const {name, _id, email, img} = user;
+                res.json({name, _id, email, img})
             })
         }
     }
@@ -92,17 +68,9 @@ router.post('/register', registerValidators, async (req, res) => {
 
         const errors = validationResult(req) // получаем ошибки валдации (если есть)
         if (!errors.isEmpty()) { // если переменная с ошибками не пуста
-            req.flash('error', errors.array()[0].msg)
 
-            return res.status(422).render('auth/register', {
-                title: 'Регистрация',
-                layout: 'main',
-                error: req.flash('error'),
-                data: {
-                    email,
-                    password,
-                    name
-                }
+            return res.status(400).json({
+                msg: errors.array()[0].msg,
             })
         }
 
@@ -121,8 +89,8 @@ router.post('/register', registerValidators, async (req, res) => {
             permissions: perm._id
         })
 
-        await user.save()
-        res.redirect('/auth/login')
+        const current = await user.save()
+        res.json(current)
 
         /*
             отправляем письмо через метод sendMail() у transporter
@@ -133,61 +101,6 @@ router.post('/register', registerValidators, async (req, res) => {
         console.log(e)
     }
 
-})
-
-router.get('/logout', async (req, res) => {
-    // очищаем сессию
-    req.session.destroy(() => {
-        // callback-функция может использоваться для удаления сессии из MongoDB
-        res.redirect('/auth/login')
-    })
-})
-
-router.get('/reset', (req, res) => {
-    res.render('auth/reset', {
-        title: 'Забыли пароль?',
-        layout: 'empty',
-        error: req.flash('error')
-    })
-})
-
-router.get('/password', async (req, res) => {
-    if (!req.params.token) {
-        return res.redirect('/auth/login')
-    }
-})
-
-router.get('/password/:token', async (req, res) => {
-    if (!req.params.token) {
-        return res.redirect('/auth/login')
-    }
-
-    try {
-        const user = await User.findOne({
-            'reset.token': req.params.token,
-            'reset.expires': {$gt: Date.now()} // $gt - это условие, по которому значение reset.expires должно быть больше Date.now() - текущей даты
-        })
-
-        if (!user) {
-            return res.redirect('/auth/login')
-        } else {
-            res.render('auth/password', {
-                title: 'Восстановление пароля',
-                layout: 'empty',
-                error: req.flash('error'),
-                userId: user._id.toString(),
-                token: req.params.token
-            })
-        }
-    } catch (e) {
-        console.log(e)
-    }
-
-    res.render('auth/password', {
-        title: 'Забыли пароль?',
-        layout: 'empty',
-        error: req.flash('error')
-    })
 })
 
 router.post('/reset', (req, res) => {
@@ -215,12 +128,11 @@ router.post('/reset', (req, res) => {
             if (candidate) {
                 candidate.reset.token = token
                 candidate.reset.expires = Date.now() + 60 * 10 * 1000 // задаём время жизни токена в мс (60 сек * 60 минут * 1000)
-                await candidate.save()
+                const current = await candidate.save()
                 await transporter.sendMail(resetEmail(candidate.email, token))
-                res.redirect('/auth/login')
+                res.json(current)
             } else {
-                req.flash('error', 'Такого email не существует')
-                res.redirect('/auth/reset')
+                res.status(400).json({msg: 'Такого email не существует'})
             }
         })
     } catch (e) {
@@ -239,12 +151,11 @@ router.post('/password', async (req, res) => {
         if (user) {
             user.password = await bcrypt.hash(req.body.password, 10) // шифрование пароля
             user.reset = undefined // очищаем данные токена
-            await user.save() // сохраняем пользователя
-                res.redirect('/auth/login')
+            const current = await user.save() // сохраняем пользователя
+                res.json(current)
                 await transporter.sendMail(passwordEmail(user.email))
         } else {
-            req.flash('error', 'Время жизни токена истекло')
-            res.redirect('/auth/login')
+            res.status(400).json({msg: 'Время жизни токена истекло'})
         }
     } catch (e) {
         console.log(e)

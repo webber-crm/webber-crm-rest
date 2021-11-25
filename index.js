@@ -2,7 +2,6 @@ const express = require('express')
 const session = require('express-session')
 const MongoStore = require('connect-mongodb-session')(session)
 const path = require('path')
-const csrf = require('csurf')
 const flash = require('connect-flash')
 const mongoose = require('mongoose')
 const helmet = require('helmet')
@@ -77,12 +76,6 @@ app.use(session({
     resave: false,
     store
 }))
-
-/*
-    регистрируем CSRF-защиту
- */
-app.use(csrf())
-
 
 /*
     регистрируем Flash - обработка ошибок
