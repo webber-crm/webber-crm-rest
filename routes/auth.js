@@ -36,9 +36,8 @@ router.post('/login', loginValidators, async (req, res) => {
         return res.status(401).json({ msg: errors.array()[0].msg });
     }
 
-    const { email, password } = req.body;
-    const user = await User.findOne({ email }).populate('permissions');
-    const permissions = user.permissions ? user.permissions.idx : -1;
+    const { username, password } = req.body;
+    const user = await User.findOne({ $or: [{ email: username }, { username }] });
 
     if (req.body.password) {
         const isEqual = await bcrypt.compare(password, user.password);
@@ -46,7 +45,6 @@ router.post('/login', loginValidators, async (req, res) => {
         if (isEqual) {
             req.session.isAuthorized = true; // устанавливаем ключ сессии isAuthenticated = true
             req.session.user = user;
-            req.session.perm = permissions;
 
             /*
                сохраняем сессию, добавляем обработку,
@@ -79,8 +77,7 @@ router.post('/reset', (req, res) => {
     try {
         crypto.randomBytes(32, async (err, buffer) => {
             if (err) {
-                req.flash('error', 'Что-то пошло не так, повторите попытку позже');
-                return res.redirect('/auth/reset');
+                return res.status(400).json({ msg: 'Что-то пошло не так, повторите попытку позже' });
             }
 
             const token = buffer.toString('hex');
