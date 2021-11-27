@@ -1,4 +1,4 @@
-const keys = require('../config')
+const keys = require('../config');
 
 module.exports = function (email) {
     return {
@@ -12,6 +12,6 @@ module.exports = function (email) {
             </p>
             <hr />
             <a href="${keys.BASE_URL}">Перейти в Webber CRM</a>
-        `
-    }
-}
+        `,
+    };
+};

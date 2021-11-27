@@ -1,6 +1,6 @@
 // экспортируем функцию, в которой всё стандартно, кроме email-адреса получателя
 
-const keys = require('../config')
+const keys = require('../config');
 
 module.exports = function (email, name) {
     return {
@@ -13,6 +13,6 @@ module.exports = function (email, name) {
             <p>Ваш E-mail в системе: ${email}</p>
             <hr />
             <a href="${keys.BASE_URL}">Перейти в систему</a>
-        `
-    }
-}
+        `,
+    };
+};

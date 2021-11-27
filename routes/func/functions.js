@@ -1,8 +1,7 @@
-const path = require('path')
-const fs = require('fs')
+const fs = require('fs');
+const path = require('path');
 
 const func = {
-
     /*
         функция загрузки файла из формы в файловую систему
         возвращем путь до загруженной фотографии
@@ -10,46 +9,44 @@ const func = {
         принимается параметр img - картинка из формы
      */
     async uploadUserImage(img) {
-        const uploads = path.join(__dirname, '..', '..', 'assets', 'uploads')
-        const images = path.join(__dirname, '..', '..', 'assets', 'uploads', 'images')
+        const uploads = path.join(__dirname, '..', '..', 'assets', 'uploads');
+        const images = path.join(__dirname, '..', '..', 'assets', 'uploads', 'images');
 
-        fs.stat(uploads, function(err) {
+        fs.stat(uploads, err => {
             if (err) {
                 if (err.code === 'ENOENT') {
-                    fs.mkdir(uploads, err => { // путь, callback
-                        if (err) throw new Error(err) // вывод ошибки
-
-                        console.log('Folder "uploads" created')
-                    })
+                    fs.mkdir(uploads, err => {
+                        // путь, callback
+                        if (err) throw new Error(err); // вывод ошибки
+                    });
                 } else {
-                    throw Error(err)
+                    throw Error(err);
                 }
             }
         });
 
-        fs.stat(images, function(err) {
+        fs.stat(images, err => {
             if (err) {
                 if (err.code === 'ENOENT') {
-                    fs.mkdir(images, err => { // путь, callback
-                        if (err) throw new Error(err) // вывод ошибки
-
-                        console.log('Folder "uploads" created')
-                    })
+                    fs.mkdir(images, err => {
+                        // путь, callback
+                        if (err) throw new Error(err); // вывод ошибки
+                    });
                 } else {
-                    throw Error(err)
+                    throw Error(err);
                 }
             }
         });
 
         // создание файла fs.writeFile()
-        const uploadPath = path.join(images, img.name)
-        const imagePath = path.join('uploads', 'images', img.name)
+        const uploadPath = path.join(images, img.name);
+        const imagePath = path.join('uploads', 'images', img.name);
 
-        await img.mv(uploadPath, function(err) {
-            if (err) throw new Error(err)
+        await img.mv(uploadPath, err => {
+            if (err) throw new Error(err);
         });
 
-        return '/' + imagePath;
+        return `/${imagePath}`;
     },
 
     /*
@@ -59,9 +56,9 @@ const func = {
      */
     getJSONDataFromString(str) {
         try {
-            str = JSON.parse(str)
+            str = JSON.parse(str);
         } catch (e) {
-            str = [ str ]
+            str = [str];
         }
 
         return str;
@@ -78,10 +75,7 @@ const func = {
         en - YYYY-MM-DD (как правило, для input[type="date"])
      */
     getFormattedDate(date) {
-        return {
-            ru: date.toLocaleDateString('ru-RU'),
-            en: date.toISOString().substring(0, 10)
-        }
+        return { ru: date.toLocaleDateString('ru-RU'), en: date.toISOString().substring(0, 10) };
     },
 
     /*
@@ -94,18 +88,21 @@ const func = {
 
         параметр field может быть id или массивом, который содержит ID в виде ObjectID
      */
-    getFilteredSelectList: function (data, field) {
+    getFilteredSelectList(data, field) {
         if (Array.isArray(field)) {
-            return data.map(obj => field.includes(obj._id) ? {
-                ...obj.toObject(),
-                selected: true
-            } : {...obj.toObject(), selected: false})
-        } else {
-            return field ? data.map(obj => obj._id.toString() === field._id.toString() ? {
-                ...obj.toObject(),
-                selected: true
-            } : {...obj.toObject(), selected: false}) : data
+            return data.map(obj =>
+                field.includes(obj._id)
+                    ? { ...obj.toObject(), selected: true }
+                    : { ...obj.toObject(), selected: false },
+            );
         }
+        return field
+            ? data.map(obj =>
+                  obj._id.toString() === field._id.toString()
+                      ? { ...obj.toObject(), selected: true }
+                      : { ...obj.toObject(), selected: false },
+              )
+            : data;
     },
 
     /*
@@ -119,8 +116,14 @@ const func = {
         по свойству field происходит проверка основного объекта, полученного из БД
      */
     async getFilteredSelectListFromDB(model, field) {
-        const data = await model.find()
-        return field ? data.map(obj => obj._id.toString() === field._id.toString() ? {...obj.toObject(), selected: true } : {...obj.toObject(), selected: false }) : data
+        const data = await model.find();
+        return field
+            ? data.map(obj =>
+                  obj._id.toString() === field._id.toString()
+                      ? { ...obj.toObject(), selected: true }
+                      : { ...obj.toObject(), selected: false },
+              )
+            : data;
     },
 
     /*
@@ -132,9 +135,13 @@ const func = {
         в массиве check проверяется наличие ID текущего элемента
      */
     async getFilteredArrayFromDB(model, field, check = null) {
-        const data = await model.find()
-        return data.filter(item => item._id.toString() !== field._id.toString() && (check !== null ? check.includes(item._id.toString()) : true))
-    }
-}
+        const data = await model.find();
+        return data.filter(
+            item =>
+                item._id.toString() !== field._id.toString() &&
+                (check !== null ? check.includes(item._id.toString()) : true),
+        );
+    },
+};
 
-module.exports = func
+module.exports = func;

@@ -1,0 +1,48 @@
+{
+    "env": {
+        "browser": false,
+        "node": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "extends": [
+        "prettier",
+        "airbnb-base"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 13
+    },
+    "rules": {
+        "no-warning-comments": "off",
+        "max-len": "off",
+        "indent": ["error", 4],
+        "prefer-promise-reject-errors": [0],
+        "object-curly-newline": "off",
+        "no-multiple-empty-lines": [2, {"max": 1}],
+        "max-lines": [1, {"max": 300}],
+        "no-console": [0],
+        "no-empty": [2],
+        "no-empty-pattern": [2],
+        "no-redeclare": [1],
+        "no-shadow": [1],
+        "no-bitwise": [0],
+        "default-case": [0],
+        "no-param-reassign": [1],
+        "no-nested-ternary": [1],
+        "consistent-return": [1],
+        "require-yield": [1],
+        "prefer-object-spread": [1],
+        "no-underscore-dangle": [0],
+        "no-plusplus": [0],
+        "no-await-in-loop": [1],
+        "no-async-promise-executor": [1],
+        "arrow-parens": [0]
+    },
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [".js", ".jsx", ".ts", ".tsx"]
+            }
+        }
+    }
+}

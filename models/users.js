@@ -1,29 +1,29 @@
-const {Schema, model} = require('mongoose') // подключаем класс Schema и функцию model() из mongoose
+const { Schema, model } = require('mongoose'); // подключаем класс Schema и функцию model() из mongoose
 
 const users = new Schema({
     username: {
         type: String,
-        required: true
+        required: true,
     },
     password: {
         type: String,
-        required: true
+        required: true,
     },
     email: {
         type: String,
-        required: true
+        required: true,
     },
     reset: {
         token: String,
-        expires: Date
+        expires: Date,
     },
     name: {
         first: {
             type: String,
-            required: true
+            required: true,
         },
         last: String,
-        middle: String
+        middle: String,
     },
     price: Number,
     is_active: {
@@ -32,12 +32,12 @@ const users = new Schema({
     },
     job: {
         type: Schema.Types.ObjectId,
-        ref: 'Jobs'
+        ref: 'Jobs',
     },
     role: {
         type: String,
-        required: true
+        required: true,
     },
-})
+});
 
-module.exports = model('Users', users)
+module.exports = model('Users', users);

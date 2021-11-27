@@ -1,15 +1,18 @@
-const {Router} = require('express') // аналог const express.Router = require('express')
-const User = require('../models/users')
-const {validationResult} = require('express-validator')
-const { loginValidators } = require('../utils/validators')
-const nodemailer = require('nodemailer') // подключаем общий пакет для отправки email
-const sendgrid = require('nodemailer-sendgrid-transport') // пакет email для сервиса sendgrid
-const crypto = require('crypto')
-const bcrypt = require('bcryptjs')
-const router = Router()
-const keys = require('../config')
-const resetEmail = require('../emails/reset')
-const passwordEmail = require('../emails/password')
+const crypto = require('crypto');
+
+const bcrypt = require('bcryptjs');
+const { Router } = require('express'); // аналог const express.Router = require('express')
+const { validationResult } = require('express-validator');
+const nodemailer = require('nodemailer'); // подключаем общий пакет для отправки email
+const sendgrid = require('nodemailer-sendgrid-transport'); // пакет email для сервиса sendgrid
+
+const keys = require('../config');
+const passwordEmail = require('../emails/password');
+const resetEmail = require('../emails/reset');
+const User = require('../models/users');
+const { loginValidators } = require('../utils/validators');
+
+const router = Router();
 
 /*
     создаём transporter для sendgrid
@@ -17,30 +20,33 @@ const passwordEmail = require('../emails/password')
     в метод createTransport передаём функцию из пакета "nodemailer-sendgrid-transport"
     внутри функции sendrid передаём объект конфигурации
  */
-const transporter = nodemailer.createTransport(sendgrid({
-    auth: {
-        api_key: keys.SENDGRID_API_KEY // передаём ключ API, полученный в Sendgrid
-    }
-}))
+const transporter = nodemailer.createTransport(
+    sendgrid({
+        auth: {
+            api_key: keys.SENDGRID_API_KEY, // передаём ключ API, полученный в Sendgrid
+        },
+    }),
+);
 
 router.post('/login', loginValidators, async (req, res) => {
-    const errors = validationResult(req) // получаем ошибки валдации (если есть)
+    const errors = validationResult(req); // получаем ошибки валдации (если есть)
 
-    if (!errors.isEmpty()) { // если переменная с ошибками не пуста
-        return res.status(401).json({msg: errors.array()[0].msg})
+    if (!errors.isEmpty()) {
+        // если переменная с ошибками не пуста
+        return res.status(401).json({ msg: errors.array()[0].msg });
     }
 
-    const { email, password } = req.body
-    const user = await User.findOne({ email }).populate('permissions')
-    const permissions = user.permissions ? user.permissions.idx : -1
+    const { email, password } = req.body;
+    const user = await User.findOne({ email }).populate('permissions');
+    const permissions = user.permissions ? user.permissions.idx : -1;
 
     if (req.body.password) {
-        const isEqual = await bcrypt.compare(password, user.password)
+        const isEqual = await bcrypt.compare(password, user.password);
 
         if (isEqual) {
-            req.session.isAuthorized = true // устанавливаем ключ сессии isAuthenticated = true
-            req.session.user = user
-            req.session.perm = permissions
+            req.session.isAuthorized = true; // устанавливаем ключ сессии isAuthenticated = true
+            req.session.user = user;
+            req.session.perm = permissions;
 
             /*
                сохраняем сессию, добавляем обработку,
@@ -48,15 +54,15 @@ router.post('/login', loginValidators, async (req, res) => {
             */
             req.session.save(err => {
                 if (err) {
-                    throw err
+                    throw err;
                 }
 
-                const {name, _id, email, img} = user;
-                res.json({name, _id, email, img})
-            })
+                const { name, _id, email, img } = user;
+                res.json({ name, _id, email, img });
+            });
         }
     }
-})
+});
 
 router.post('/reset', (req, res) => {
     /*
@@ -73,49 +79,48 @@ router.post('/reset', (req, res) => {
     try {
         crypto.randomBytes(32, async (err, buffer) => {
             if (err) {
-                req.flash('error', 'Что-то пошло не так, повторите попытку позже')
-                return res.redirect('/auth/reset')
+                req.flash('error', 'Что-то пошло не так, повторите попытку позже');
+                return res.redirect('/auth/reset');
             }
 
-            const token = buffer.toString('hex')
-            const candidate = await User.findOne({email: req.body.email})
+            const token = buffer.toString('hex');
+            const candidate = await User.findOne({ email: req.body.email });
 
             if (candidate) {
-                candidate.reset.token = token
-                candidate.reset.expires = Date.now() + 60 * 10 * 1000 // задаём время жизни токена в мс (60 сек * 60 минут * 1000)
-                const current = await candidate.save()
-                await transporter.sendMail(resetEmail(candidate.email, token))
-                res.json(current)
+                candidate.reset.token = token;
+                candidate.reset.expires = Date.now() + 60 * 10 * 1000; // задаём время жизни токена в мс (60 сек * 60 минут * 1000)
+                const current = await candidate.save();
+                await transporter.sendMail(resetEmail(candidate.email, token));
+                res.json(current);
             } else {
-                res.status(400).json({msg: 'Такого email не существует'})
+                res.status(400).json({ msg: 'Такого email не существует' });
             }
-        })
+        });
     } catch (e) {
-        console.log(e)
+        console.log(e);
     }
-})
+});
 
 router.post('/password', async (req, res) => {
     try {
         const user = await User.findOne({
             _id: req.body.userId,
             'reset.token': req.body.token,
-            'reset.expires': {$gt: Date.now()}
-        })
+            'reset.expires': { $gt: Date.now() },
+        });
 
         if (user) {
-            user.password = await bcrypt.hash(req.body.password, 10) // шифрование пароля
-            user.reset = undefined // очищаем данные токена
-            const current = await user.save() // сохраняем пользователя
-                res.json(current)
-                await transporter.sendMail(passwordEmail(user.email))
+            user.password = await bcrypt.hash(req.body.password, 10); // шифрование пароля
+            user.reset = undefined; // очищаем данные токена
+            const current = await user.save(); // сохраняем пользователя
+            res.json(current);
+            await transporter.sendMail(passwordEmail(user.email));
         } else {
-            res.status(400).json({msg: 'Время жизни токена истекло'})
+            res.status(400).json({ msg: 'Время жизни токена истекло' });
         }
     } catch (e) {
-        console.log(e)
+        console.log(e);
     }
-})
+});
 
-
-module.exports = router
+module.exports = router;
