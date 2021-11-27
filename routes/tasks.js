@@ -5,7 +5,7 @@ const Task = require('../models/tasks');
 
 const router = Router();
 const auth = require('../middleware/auth');
-const { taskValidators, taskEditValidators } = require('../utils/validators');
+const { taskValidators, taskValidatorsEdit } = require('../utils/validators');
 
 router.get('/', auth, async (req, res) => {
     try {
@@ -45,7 +45,7 @@ router.get('/:id', auth, async (req, res) => {
     res.json(task);
 });
 
-router.patch('/:id', auth, taskEditValidators, async (req, res) => {
+router.patch('/:id', auth, taskValidatorsEdit, async (req, res) => {
     const { id } = req.params;
 
     const errors = validationResult(req); // получаем ошибки валидации (если есть)

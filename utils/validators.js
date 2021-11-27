@@ -97,7 +97,7 @@ exports.taskValidators = [
     // body(['customer', 'project'], 'Поля "Клиент" и "Проект" обязательны для заполнения').isLength({ min: 1 }).trim(),
 ];
 
-exports.taskEditValidators = [
+exports.taskValidatorsEdit = [
     ...this.taskValidators,
     body('role')
         .isLength({ min: 1 })
@@ -126,13 +126,17 @@ exports.customersValidators = [
         .isNumeric()
         .withMessage('Цена должна содержать только цифры')
         .trim(),
-    body('projects').custom(value => {
-        if (!value) {
-            throw new Error('У клиента должен быть хотя бы 1 проект');
-        }
+];
 
-        return true;
-    }),
+exports.customersValidatorsEdit = [
+    body('name').if(body('name')).isLength({ min: 1 }).withMessage('Наименование не должно быть пустым'),
+    body('price')
+        .if(body('price'))
+        .isLength({ min: 3 })
+        .withMessage('Цена должна быть от 3 символов')
+        .isNumeric()
+        .withMessage('Цена должна содержать только цифры')
+        .trim(),
 ];
 
 exports.usersValidators = [

@@ -11,7 +11,7 @@ const { customersValidators } = require('../utils/validators');
 
 router.get('/', auth, async (req, res) => {
     const customers = await Customer.find();
-    res.json(customers || []);
+    res.json(customers);
 });
 
 router.post('/', auth, customersValidators, async (req, res) => {
@@ -29,10 +29,6 @@ router.post('/', auth, customersValidators, async (req, res) => {
 
         const current = await customer.save(); // вызываем метод класса Task для сохранения в БД
 
-        const user = await User.findByIdAndUpdate(req.session.user.id);
-        user.customers = user.customers.concat([customer.id]);
-        await user.save();
-
         res.json(current);
     } catch (e) {
         throw Error(e);
@@ -44,7 +40,7 @@ router.get('/:id', auth, async (req, res) => {
     res.json(customer);
 });
 
-router.patch('/:id', auth, customersValidators, async (req, res) => {
+router.patch('/:id', auth, async (req, res) => {
     const { id } = req.params; // забираем id из объекта req.params в переменную
 
     const { body } = req;
@@ -54,7 +50,7 @@ router.patch('/:id', auth, customersValidators, async (req, res) => {
         return res.status(422).json({ msg: errors.array()[0].msg });
     }
 
-    const current = await Customer.findByIdAndUpdate(id, body);
+    const current = await Customer.findByIdAndUpdate(id, body, { new: true });
     res.json(current);
 });
 
