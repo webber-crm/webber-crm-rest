@@ -3,6 +3,7 @@ const session = require('express-session')
 const MongoStore = require('connect-mongodb-session')(session)
 const path = require('path')
 const flash = require('connect-flash')
+const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const helmet = require('helmet')
 const compression = require('compression')
@@ -14,7 +15,7 @@ const variables = require('./middleware/variables')
 const homeRoutes = require('./routes/home')
 const tasksRoutes = require('./routes/tasks')
 const authRoutes = require('./routes/auth')
-const profileRoutes = require('./routes/profile')
+const usersRoutes = require('./routes/users')
 const customersRoutes = require('./routes/customers')
 const errorHandler = require('./middleware/error')
 
@@ -67,6 +68,11 @@ app.use(compression())
 app.use(fileupload())
 
 /*
+ middleware для обработки запросов в body
+ */
+app.use(bodyParser.json())
+
+/*
     регистрируем middleware,
     который добавляет переменную isAuth во все шаблоны через объект res
  */
@@ -78,9 +84,9 @@ app.use(variables)
     2 параметр - переменная с подключенным роутом
  */
 app.use('/', homeRoutes) // регистрируем роут home.js
+app.use('/users', usersRoutes)
 app.use('/tasks', tasksRoutes)
 app.use('/auth', authRoutes)
-app.use('/profile', profileRoutes)
 app.use('/customers', customersRoutes)
 
 app.use(errorHandler)

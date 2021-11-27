@@ -1,16 +1,13 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
 const User = require('../models/users')
-const Permissions = require('../models/roles')
-const ObjectId = require('mongoose').Types.ObjectId
 const {validationResult} = require('express-validator')
-const { registerValidators, loginValidators } = require('../utils/validators')
+const { loginValidators } = require('../utils/validators')
 const nodemailer = require('nodemailer') // подключаем общий пакет для отправки email
 const sendgrid = require('nodemailer-sendgrid-transport') // пакет email для сервиса sendgrid
 const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 const router = Router()
 const keys = require('../config')
-const registerEmail = require('../emails/registration')
 const resetEmail = require('../emails/reset')
 const passwordEmail = require('../emails/password')
 
@@ -59,48 +56,6 @@ router.post('/login', loginValidators, async (req, res) => {
             })
         }
     }
-})
-
-router.post('/register', registerValidators, async (req, res) => {
-
-    try {
-        const { email, password, name } = req.body
-
-        const errors = validationResult(req) // получаем ошибки валдации (если есть)
-        if (!errors.isEmpty()) { // если переменная с ошибками не пуста
-
-            return res.status(400).json({
-                msg: errors.array()[0].msg,
-            })
-        }
-
-        /*
-            создаём хэш пароля
-         */
-        const hashPassword = await bcrypt.hash(password, 10)
-        const perm = await Permissions.findOne({idx: 4})
-
-        const user = new User({
-            email,
-            password: hashPassword,
-            name: {
-                first: name
-            },
-            permissions: perm._id
-        })
-
-        const current = await user.save()
-        res.json(current)
-
-        /*
-            отправляем письмо через метод sendMail() у transporter
-            отправку письма рекомендуется делать после редиректов, чтобы не наблюдать задержек
-         */
-        await transporter.sendMail(registerEmail(email, name))
-    } catch (e) {
-        console.log(e)
-    }
-
 })
 
 router.post('/reset', (req, res) => {

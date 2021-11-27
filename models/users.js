@@ -26,13 +26,17 @@ const users = new Schema({
         middle: String
     },
     price: Number,
+    is_active: {
+        type: Boolean,
+        default: true,
+    },
     job: {
         type: Schema.Types.ObjectId,
         ref: 'Jobs'
     },
     role: {
-        type: Schema.Types.ObjectId,
-        ref: 'Roles'
+        type: String,
+        required: true
     },
 })
 

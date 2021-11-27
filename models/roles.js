@@ -5,6 +5,10 @@ const roles = new Schema({
         type: String,
         required: true
     },
+    role: {
+        type: String,
+        required: true
+    }
 })
 
 module.exports = model('Roles', roles)

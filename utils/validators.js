@@ -123,7 +123,7 @@ exports.customersValidators = [
     })
 ]
 
-exports.profileValidators = [
+exports.usersValidators = [
     body('firstname', 'Имя  не должно быть пустым')
         .isLength({min: 1})
         .trim(),
