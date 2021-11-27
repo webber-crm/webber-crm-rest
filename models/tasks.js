@@ -37,7 +37,6 @@ const tasks = new Schema({
         ref: 'Projects'
     },
     customer: {
-        required: true,
         type: Schema.Types.ObjectId,
         ref: 'Customers'
     },
@@ -49,11 +48,6 @@ const tasks = new Schema({
         type: [Schema.Types.ObjectId],
         ref: 'Comments'
     },
-    created_at: {
-        type: Date,
-        default: Date.now
-    },
-    updated_at: Date
-})
+}, {timestamps: true, id: true})
 
 module.exports = model('Tasks', tasks) // экспортируем модель, передаём схему tasks
