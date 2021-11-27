@@ -6,9 +6,6 @@ const flash = require('connect-flash')
 const mongoose = require('mongoose')
 const helmet = require('helmet')
 const compression = require('compression')
-const exphbs = require('express-handlebars')
-const Handlebars = require('handlebars')
-const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 const keys = require('./config')
 
 const fileupload = require('express-fileupload')
@@ -23,31 +20,10 @@ const errorHandler = require('./middleware/error')
 
 const app = express()
 
-const hbs = exphbs.create({
-    defaultLayout: 'default', // шаблон по умолчанию
-    extname: 'hbs', // расширение страниц (views) и шаблонов (layouts) - (по умолчанию .handlebars)
-    handlebars: allowInsecurePrototypeAccess(Handlebars), // исправляем ошибку при запросе с MongoDB
-    helpers: require('./utils/hbs-helper')
-})
-
 const store = new MongoStore({
     connection: 'sessions',
     uri: keys.MONGODB_URI
 })
-
-/*
-    регистрируем движок Handlebars в Express.js
-    1 параметр - название движка (задаётся на своё усмотрение)
-    2 параметр - передаём движок, указанный в переменной hbs
-*/
-app.engine('hbs', hbs.engine)
-
-/*
-    подключаем Handlebars в качестве движка для рендеринга html:
-    1 параметр - 'view engine' (даём Express.js понять, что хотим подключить именно движок)
-    2 параметр - название движка, указанный в 1 параметре app.engine()
-*/
-app.set('view engine', 'hbs')
 
 /*
     устанавливаем папку, в которой будут содержаться шаблоны html
