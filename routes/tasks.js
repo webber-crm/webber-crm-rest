@@ -1,5 +1,5 @@
 const {Router} = require('express') // аналог const express.Router = require('express')
-const Task = require('../models/task')
+const Task = require('../models/tasks')
 const Status = require('../models/status')
 const {validationResult} = require('express-validator')
 const ObjectId = require('mongoose').Types.ObjectId

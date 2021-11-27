@@ -1,6 +1,6 @@
 // подключаем функциб проверки body из пакета express-validator
 const { body } = require('express-validator')
-const User = require('../models/user')
+const User = require('../models/users')
 const bcrypt = require('bcryptjs')
 
 exports.registerValidators = [

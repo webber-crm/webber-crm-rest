@@ -1,15 +1,15 @@
 const {Schema, model} = require('mongoose') // подключаем класс Schema и функцию model() из mongoose
 
-const permission = new Schema({
-    title: {
+const projects = new Schema({
+    name: String,
+    domain: {
         type: String,
         required: true
     },
-    idx: {
-        type: Number,
-        required: true,
-        unique: true
+    customer: {
+        type: Schema.Types.ObjectId,
+        ref: 'Customers'
     }
 })
 
-module.exports = model('Permissions', permission)
+module.exports = model('Projects', projects)

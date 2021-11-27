@@ -1,0 +1,59 @@
+const {Schema, model} = require('mongoose') // подключаем класс Schema и функцию model() из mongoose
+
+const tasks = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    text: String,
+    time: {
+        est: Number,
+        fact: Number,
+        calc: {
+            type: Number,
+            default: 0
+        }
+    },
+    roles: {
+        creator: {
+            type: Schema.Types.ObjectId,
+            ref: 'Users'
+        },
+        dev: {
+            type: Schema.Types.ObjectId,
+            ref: 'Users'
+        },
+        observers: {
+            type: [Schema.Types.ObjectId],
+            ref: 'Users'
+        }
+    },
+    is_active: {
+        type: Boolean,
+        default: true
+    },
+    project: {
+        type: Schema.Types.ObjectId,
+        ref: 'Projects'
+    },
+    customer: {
+        required: true,
+        type: Schema.Types.ObjectId,
+        ref: 'Customers'
+    },
+    status: {
+        type: Schema.Types.ObjectId,
+        ref: 'Status'
+    },
+    comments: {
+        type: [Schema.Types.ObjectId],
+        ref: 'Comments'
+    },
+    created_at: {
+        type: Date,
+        default: Date.now
+    },
+    updated_at: Date
+})
+
+module.exports = model('Tasks', tasks) // экспортируем модель, передаём схему tasks

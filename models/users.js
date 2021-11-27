@@ -1,15 +1,15 @@
 const {Schema, model} = require('mongoose') // подключаем класс Schema и функцию model() из mongoose
 
-const user = new Schema({
-    email: {
-        type: String,
-        required: true
-    },
+const users = new Schema({
     username: {
         type: String,
         required: true
     },
     password: {
+        type: String,
+        required: true
+    },
+    email: {
         type: String,
         required: true
     },
@@ -25,23 +25,15 @@ const user = new Schema({
         last: String,
         middle: String
     },
-    birthday: Date,
-    phone: String,
-    city: String,
     price: Number,
-    img: String,
     job: {
         type: Schema.Types.ObjectId,
         ref: 'Jobs'
     },
-    permissions: {
+    role: {
         type: Schema.Types.ObjectId,
-        ref: 'Permissions'
+        ref: 'Roles'
     },
-    customers: {
-        type: [Schema.Types.ObjectId],
-        ref: 'Customer'
-    }
 })
 
-module.exports = model('User', user)
+module.exports = model('Users', users)

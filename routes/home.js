@@ -1,9 +1,9 @@
 // Регистрация роута
 
 const {Router} = require('express') // аналог const express.Router = require('express')
-const User = require('../models/user')
-const Task = require('../models/task')
-const Customer = require('../models/customer')
+const User = require('../models/users')
+const Task = require('../models/tasks')
+const Customer = require('../models/customers')
 const router = Router()
 const auth = require('../middleware/auth')
 

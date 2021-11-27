@@ -1,10 +1,10 @@
 const {Schema, model} = require('mongoose') // подключаем класс Schema и функцию model() из mongoose
 
-const status = new Schema({
-    title: {
+const roles = new Schema({
+    name: {
         type: String,
         required: true
     },
 })
 
-module.exports = model('Status', status)
+module.exports = model('Roles', roles)
