@@ -40,7 +40,7 @@ router.post('/login', loginValidators, async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ $or: [{ email: username }, { username }] });
 
-    if (req.body.password) {
+    if (password) {
         const isEqual = await bcrypt.compare(password, user.password);
 
         if (isEqual) {

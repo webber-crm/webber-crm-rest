@@ -2,35 +2,34 @@ const { Router } = require('express'); // аналог const express.Router = re
 const { validationResult } = require('express-validator');
 
 const { isValidObjectId } = require('mongoose');
-const Task = require('../models/tasks');
+const Project = require('../models/projects');
 
 const router = Router();
 const auth = require('../middleware/auth');
-const { taskValidators, taskValidatorsEdit } = require('../utils/validators');
+
+const { projectsValidators } = require('../utils/validators');
 
 router.get('/', auth, async (req, res) => {
-    try {
-        const tasks = await Task.find();
-        res.json(tasks);
-    } catch (e) {
-        throw Error(e);
-    }
+    const projects = await Project.find();
+    res.json(projects);
 });
 
-router.post('/', auth, taskValidators, async (req, res) => {
+router.post('/', auth, projectsValidators, async (req, res) => {
+    const { body } = req;
+
     const errors = validationResult(req); // получаем ошибки валдации (если есть)
+
+    // если переменная с ошибками не пуста
     if (!errors.isEmpty()) {
-        // если переменная с ошибками не пуста
         return res.status(422).json({ msg: errors.array()[0].msg });
     }
 
-    const { body } = req;
-
     try {
-        const task = new Task(body);
-        const current = await task.save(); // вызываем метод класса Task для сохранения в БД
+        const role = new Project(body);
 
-        res.status(201).json(current);
+        const current = await role.save(); // вызываем метод класса Task для сохранения в БД
+
+        res.json(current);
     } catch (e) {
         throw Error(e);
     }
@@ -43,36 +42,31 @@ router.get('/:id', auth, async (req, res) => {
         return res.status(400).json({ msg: 'Неправильный формат id' });
     }
 
-    const task = await Task.findById(id);
+    const role = await Project.findById(id);
 
-    if (!task) {
-        return res.status(404).json({ msg: 'Задача не найдена' });
+    if (!role) {
+        return res.status(404).json({ msg: 'Проект не найден' });
     }
 
-    res.json(task);
+    res.json(role);
 });
 
-router.patch('/:id', auth, taskValidatorsEdit, async (req, res) => {
+router.patch('/:id', auth, projectsValidators, async (req, res) => {
     const { id } = req.params;
 
     if (!isValidObjectId(id)) {
         return res.status(400).json({ msg: 'Неправильный формат id' });
     }
 
-    const errors = validationResult(req); // получаем ошибки валидации (если есть)
+    const { body } = req;
+
+    const errors = validationResult(req); // получаем ошибки валдации (если есть)
     if (!errors.isEmpty()) {
-        // если переменная с ошибками не пуста
         return res.status(422).json({ msg: errors.array()[0].msg });
     }
 
-    const { body } = req;
-
-    try {
-        const current = await Task.findByIdAndUpdate(id, body, { new: true });
-        res.json(current);
-    } catch (e) {
-        throw Error(e);
-    }
+    const current = await Project.findByIdAndUpdate(id, body, { new: true });
+    res.json(current);
 });
 
 router.delete('/:id', auth, async (req, res) => {
@@ -82,7 +76,8 @@ router.delete('/:id', auth, async (req, res) => {
         return res.status(400).json({ msg: 'Неправильный формат id' });
     }
 
-    await Task.findByIdAndRemove(id);
+    await Project.findByIdAndDelete(id);
+
     res.status(204).json({});
 });
 

@@ -1,6 +1,7 @@
 const { Router } = require('express'); // аналог const express.Router = require('express')
 const { validationResult } = require('express-validator');
 
+const { isValidObjectId } = require('mongoose');
 const Role = require('../models/roles');
 
 const router = Router();
@@ -36,12 +37,27 @@ router.post('/', auth, restricted, rolesValidators, async (req, res) => {
 });
 
 router.get('/:id', auth, restricted, async (req, res) => {
-    const role = await Role.findById(req.params.id);
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+        return res.status(400).json({ msg: 'Неправильный формат id' });
+    }
+
+    const role = await Role.findById(id);
+
+    if (!role) {
+        return res.status(404).json({ msg: 'Роль не найдена' });
+    }
+
     res.json(role);
 });
 
 router.patch('/:id', auth, restricted, rolesValidators, async (req, res) => {
-    const { id } = req.params; // забираем id из объекта req.params в переменную
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+        return res.status(400).json({ msg: 'Неправильный формат id' });
+    }
 
     const { body } = req;
 
@@ -55,7 +71,13 @@ router.patch('/:id', auth, restricted, rolesValidators, async (req, res) => {
 });
 
 router.delete('/:id', auth, restricted, async (req, res) => {
-    await Role.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+        return res.status(400).json({ msg: 'Неправильный формат id' });
+    }
+
+    await Role.findByIdAndDelete(id);
 
     res.status(204).json({});
 });

@@ -4,6 +4,7 @@ const { body } = require('express-validator');
 
 const User = require('../models/users');
 const Role = require('../models/roles');
+const Project = require('../models/projects');
 
 exports.registerValidators = [
     body(['email', 'username'])
@@ -170,6 +171,25 @@ exports.rolesValidators = [
                 if (candidate) {
                     // если пользователь найден И этот пользователь не текущий
                     return Promise.reject('Роль с таким ключом уже существует');
+                }
+
+                return Promise.resolve();
+            } catch (e) {
+                console.log(e);
+            }
+        })
+        .normalizeEmail(), // санитайзер, нормализует Email
+];
+
+exports.projectsValidators = [
+    body('name').if(body('name')).isLength({ min: 1 }).withMessage('Название не должно быть пустым').trim(),
+    body('domain')
+        .if(body('domain'))
+        .custom(async value => {
+            try {
+                const candidate = await Project.findOne({ domain: value });
+                if (candidate) {
+                    return Promise.reject('Такой уже существует');
                 }
 
                 return Promise.resolve();
