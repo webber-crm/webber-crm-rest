@@ -57,10 +57,6 @@ router.patch('/:id', auth, async (req, res) => {
 router.delete('/:id', auth, async (req, res) => {
     await Customer.findByIdAndDelete(req.params.id);
 
-    const user = await User.findById(req.session.user.id);
-    user.customers = user.customers.filter(c => c.toString() !== req.params.id.toString());
-    await user.save();
-
     res.status(204).json({});
 });
 
