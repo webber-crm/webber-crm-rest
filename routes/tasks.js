@@ -21,7 +21,7 @@ router.post('/', auth, taskValidators, async (req, res) => {
     const errors = validationResult(req); // получаем ошибки валдации (если есть)
     if (!errors.isEmpty()) {
         // если переменная с ошибками не пуста
-        return res.status(422).json({ msg: errors.array()[0].msg });
+        return res.status(400).json({ msg: errors.array()[0].msg });
     }
 
     const { body } = req;
@@ -62,7 +62,7 @@ router.patch('/:id', auth, taskValidatorsEdit, async (req, res) => {
     const errors = validationResult(req); // получаем ошибки валидации (если есть)
     if (!errors.isEmpty()) {
         // если переменная с ошибками не пуста
-        return res.status(422).json({ msg: errors.array()[0].msg });
+        return res.status(400).json({ msg: errors.array()[0].msg });
     }
 
     const { body } = req;
