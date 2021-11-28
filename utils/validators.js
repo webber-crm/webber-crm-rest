@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const { body } = require('express-validator');
 
 const User = require('../models/users');
+const Role = require('../models/roles');
 
 exports.registerValidators = [
     body(['email', 'username'])
@@ -140,7 +141,7 @@ exports.customersValidatorsEdit = [
 ];
 
 exports.usersValidators = [
-    body('firstname', 'Имя  не должно быть пустым').isLength({ min: 1 }).trim(),
+    body('firstname', 'Имя не должно быть пустым').isLength({ min: 1 }).trim(),
     body('email')
         .isEmail()
         .withMessage('Введите корректный Email')
@@ -153,6 +154,25 @@ exports.usersValidators = [
                     // если пользователь найден И этот пользователь не текущий
                     return Promise.reject('Этот email уже занят');
                 }
+            } catch (e) {
+                console.log(e);
+            }
+        })
+        .normalizeEmail(), // санитайзер, нормализует Email
+];
+
+exports.rolesValidators = [
+    body('name', 'Название не должно быть пустым').isLength({ min: 1 }).trim(),
+    body('slug')
+        .custom(async value => {
+            try {
+                const candidate = await Role.findOne({ role: value });
+                if (candidate) {
+                    // если пользователь найден И этот пользователь не текущий
+                    return Promise.reject('Роль с таким ключом уже существует');
+                }
+
+                return Promise.resolve();
             } catch (e) {
                 console.log(e);
             }

@@ -20,6 +20,7 @@ const authRoutes = require('./routes/auth');
 const customersRoutes = require('./routes/customers');
 const tasksRoutes = require('./routes/tasks');
 const usersRoutes = require('./routes/users');
+const rolesRoutes = require('./routes/roles');
 
 const app = express();
 
@@ -78,6 +79,7 @@ app.use(variables);
     2 параметр - переменная с подключенным роутом
  */
 app.use('/auth', authRoutes);
+app.use('/users/roles', rolesRoutes);
 app.use('/users', usersRoutes);
 app.use('/tasks', tasksRoutes);
 app.use('/customers', customersRoutes);

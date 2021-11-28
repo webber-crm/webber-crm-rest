@@ -9,7 +9,6 @@ module.exports = function (req, res, next) {
     */
     res.locals.isAuth = req.session.isAuthorized;
     res.locals.user = req.session.user;
-    res.locals.perm = req.session.perm;
 
     /*
         добавляем токен CSRF в объект ответа,

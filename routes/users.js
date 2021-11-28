@@ -3,6 +3,9 @@ const { Router } = require('express'); // аналог const express.Router = re
 const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer'); // подключаем общий пакет для отправки email
 const sendgrid = require('nodemailer-sendgrid-transport'); // пакет email для сервиса sendgrid
+const { isValidObjectId, Types } = require('mongoose');
+
+const { ObjectId } = Types;
 
 const keys = require('../config');
 const deleteEmail = require('../emails/delete');
@@ -66,7 +69,16 @@ router.post('/', async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
     const { id } = req.params;
 
+    if (!isValidObjectId(id)) {
+        return res.status(400).json({ msg: 'Неправильный формат id' });
+    }
+
     const user = await User.findById(id);
+
+    if (!user) {
+        return res.status(404).json({ msg: 'Пользователь не найден' });
+    }
+
     res.json(user);
 });
 

@@ -8,6 +8,8 @@ const roles = new Schema({
     role: {
         type: String,
         required: true,
+        unique: true,
+        uppercase: true,
     },
 });
 
