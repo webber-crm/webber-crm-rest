@@ -28,7 +28,7 @@ router.post('/', auth, customersValidators, async (req, res) => {
         const customer = new Customer(body);
         const current = await customer.save(); // вызываем метод класса Task для сохранения в БД
 
-        res.json(current);
+        res.status(201).json(current);
     } catch (e) {
         throw Error(e);
     }

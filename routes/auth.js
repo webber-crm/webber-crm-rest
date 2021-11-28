@@ -57,7 +57,7 @@ router.post('/login', loginValidators, async (req, res) => {
                 }
 
                 const { name, _id, email, img } = user;
-                res.json({ name, _id, email, img });
+                res.status(201).json({ name, _id, email, img });
             });
         }
     }

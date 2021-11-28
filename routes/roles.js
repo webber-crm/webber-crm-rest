@@ -27,10 +27,9 @@ router.post('/', auth, restricted, rolesValidators, async (req, res) => {
 
     try {
         const role = new Role(body);
-
         const current = await role.save(); // вызываем метод класса Task для сохранения в БД
 
-        res.json(current);
+        res.status(201).json(current);
     } catch (e) {
         throw Error(e);
     }

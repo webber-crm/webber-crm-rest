@@ -25,11 +25,10 @@ router.post('/', auth, projectsValidators, async (req, res) => {
     }
 
     try {
-        const role = new Project(body);
+        const project = new Project(body);
+        const current = await project.save(); // вызываем метод класса Task для сохранения в БД
 
-        const current = await role.save(); // вызываем метод класса Task для сохранения в БД
-
-        res.json(current);
+        res.status(201).json(current);
     } catch (e) {
         throw Error(e);
     }
@@ -42,13 +41,13 @@ router.get('/:id', auth, async (req, res) => {
         return res.status(400).json({ msg: 'Неправильный формат id' });
     }
 
-    const role = await Project.findById(id);
+    const project = await Project.findById(id);
 
-    if (!role) {
+    if (!project) {
         return res.status(404).json({ msg: 'Проект не найден' });
     }
 
-    res.json(role);
+    res.json(project);
 });
 
 router.patch('/:id', auth, projectsValidators, async (req, res) => {

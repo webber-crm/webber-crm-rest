@@ -50,9 +50,9 @@ router.post('/', async (req, res) => {
         const hashPassword = await bcrypt.hash(password, 10);
 
         const user = new User({ ...body, password: hashPassword });
-
         const current = await user.save();
-        res.json(current);
+
+        res.status(201).json(current);
 
         /*
             отправляем письмо через метод sendMail() у transporter
