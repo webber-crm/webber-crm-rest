@@ -11,6 +11,7 @@ const passwordEmail = require('../emails/password');
 const resetEmail = require('../emails/reset');
 const User = require('../models/users');
 const { loginValidators } = require('../utils/validators');
+const auth = require('../middleware/auth');
 
 const router = Router();
 
@@ -60,6 +61,13 @@ router.post('/login', loginValidators, async (req, res) => {
             });
         }
     }
+});
+
+router.post('/logout', auth, async (req, res) => {
+    // очищаем сессию
+    req.session.destroy(async () => {
+        res.status(204).json({});
+    });
 });
 
 router.post('/reset', (req, res) => {

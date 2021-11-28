@@ -87,21 +87,24 @@ router.patch('/:id', auth, usersValidators, async (req, res) => {
 
 router.delete('/:id', auth, async (req, res) => {
     const { id } = req.params;
-    const { email } = await User.findById(id);
+    const { email, username } = await User.findById(id);
+
+    const { user } = req.session;
+
+    if (user.email === email || user.username === username) {
+        res.status(400).json({ msg: 'Невозможно удалить текущего пользователя' });
+    }
 
     await User.findByIdAndDelete(id);
 
-    // очищаем сессию
-    req.session.destroy(async () => {
-        // callback-функция может использоваться для удаления сессии из MongoDB
-        res.status(204).json({});
+    // callback-функция может использоваться для удаления сессии из MongoDB
+    res.status(204).json({});
 
-        /*
-            отправляем письмо через метод sendMail() у transporter
-            отправку письма рекомендуется делать после редиректов, чтобы не наблюдать задержек
-         */
-        await transporter.sendMail(deleteEmail(email));
-    });
+    /*
+        отправляем письмо через метод sendMail() у transporter
+        отправку письма рекомендуется делать после редиректов, чтобы не наблюдать задержек
+     */
+    await transporter.sendMail(deleteEmail(email));
 });
 
 module.exports = router;
