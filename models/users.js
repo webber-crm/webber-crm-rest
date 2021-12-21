@@ -36,7 +36,8 @@ const users = new Schema(
             ref: 'Jobs',
         },
         role: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'Roles',
             required: true,
         },
     },
