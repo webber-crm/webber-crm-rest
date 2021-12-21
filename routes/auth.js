@@ -6,14 +6,30 @@ const { validationResult } = require('express-validator');
 const nodemailer = require('nodemailer'); // подключаем общий пакет для отправки email
 const sendgrid = require('nodemailer-sendgrid-transport'); // пакет email для сервиса sendgrid
 
+const TokenService = require('../utils/token-service');
+
 const keys = require('../config');
 const passwordEmail = require('../emails/password');
 const resetEmail = require('../emails/reset');
 const User = require('../models/users');
 const { loginValidators } = require('../utils/validators');
 const auth = require('../middleware/auth');
+const UserDTO = require('../dto/user');
 
 const router = Router();
+
+async function authorize(user) {
+    const userDTO = new UserDTO(user);
+    const tokens = TokenService.generateTokens({ ...userDTO }); // генерируем токены
+    await TokenService.saveTokens(userDTO.id, tokens.refreshToken); // записываем токен пользователю
+
+    const response = {
+        ...userDTO,
+        ...tokens,
+    };
+
+    return [userDTO, response];
+}
 
 /*
     создаём transporter для sendgrid
@@ -44,30 +60,48 @@ router.post('/login', loginValidators, async (req, res) => {
         const isEqual = await bcrypt.compare(password, user.password);
 
         if (isEqual) {
-            req.session.isAuthorized = true; // устанавливаем ключ сессии isAuthenticated = true
-            req.session.user = user;
+            const [userDTO, response] = await authorize(user);
 
-            /*
-               сохраняем сессию, добавляем обработку,
-               чтобы редирект не выполнился раньше, чем сохранится сессия
-            */
-            req.session.save(err => {
-                if (err) {
-                    throw err;
-                }
-
-                const { name, _id, email, img } = user;
-                res.status(201).json({ name, _id, email, img });
-            });
+            // устанавливаем cookie
+            res.cookie('refreshToken', userDTO, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+            res.status(201).json(response);
+        } else {
+            res.status(400).json({ msg: 'Неправильный пароль' });
         }
+    } else {
+        res.status(400).json({ msg: 'Пароль не указан' });
     }
 });
 
 router.post('/logout', auth, async (req, res) => {
-    // очищаем сессию
-    req.session.destroy(async () => {
-        res.status(204).json({});
-    });
+    const { refreshToken } = req.cookies;
+
+    const token = TokenService.removeToken(refreshToken);
+    res.clearCookie('refreshToken');
+
+    return res.json(token);
+});
+
+router.post('/refresh', auth, async (req, res) => {
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken) {
+        res.status(400).json({ msg: 'Токен не существует' });
+    }
+
+    const userData = TokenService.validateRefreshToken(refreshToken);
+    const tokenFromDb = TokenService.findToken(refreshToken);
+
+    if (!userData || !tokenFromDb) {
+        res.status(401).json({ msg: 'Токен не существует' });
+    }
+
+    const user = await User.findById(userData.id);
+    const [userDTO, response] = await authorize(user);
+
+    // устанавливаем cookie
+    res.cookie('refreshToken', userDTO, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+    res.status(201).json(response);
 });
 
 router.post('/reset', (req, res) => {

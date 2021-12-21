@@ -59,7 +59,7 @@ exports.loginValidators = [
                 const user = await User.findOne({ $or: [{ email: value }, { username: value }] });
                 if (!user) {
                     // если пользователь НЕ найден
-                    return Promise.reject('Пользователя с таким email не существует');
+                    return Promise.reject('Такого пользователя не существует');
                 }
 
                 return Promise.resolve();
