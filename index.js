@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 const compression = require('compression');
 const fileupload = require('express-fileupload');
 
+const cors = require('cors');
 const keys = require('./config');
 
 const errorHandler = require('./middleware/error');
@@ -68,6 +69,13 @@ app.use(fileupload());
  */
 app.use(bodyParser.json());
 
+app.use(
+    cors({
+        origin: ['http://localhost:3000', 'http://localhost:8000'],
+        optionsSuccessStatus: 200, // For legacy browser support
+    }),
+);
+
 /*
     регистрируем middleware,
     который добавляет переменную isAuth во все шаблоны через объект res
@@ -90,7 +98,7 @@ app.use('/customers', customersRoutes);
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 async function start() {
     try {
