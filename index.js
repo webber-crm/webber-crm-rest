@@ -71,7 +71,7 @@ app.use(bodyParser.json());
 
 app.use(
     cors({
-        origin: ['http://localhost:3000', 'http://localhost:8000'],
+        origin: ['http://localhost:3000', 'http://localhost:8000', keys.BASE_URL],
         optionsSuccessStatus: 200, // For legacy browser support
     }),
 );
