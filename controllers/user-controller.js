@@ -3,8 +3,10 @@
  */
 
 const { validationResult } = require('express-validator');
+const { isValidObjectId } = require('mongoose');
 const UserService = require('../service/user-service');
 const ApiError = require('../exceptions/api-error');
+const User = require('../models/user');
 
 class UserController {
     async registration(req, res, next) {
@@ -69,6 +71,16 @@ class UserController {
         }
     }
 
+    async getUser(req, res, next) {
+        try {
+            const { id } = req.params;
+
+            res.json(user);
+        } catch (e) {
+            next(e);
+        }
+    }
+
     async getUsers(req, res, next) {
         try {
             const users = await UserService.getAllUsers();
@@ -108,7 +120,7 @@ class UserController {
         }
     }
 
-    async reset(req, res, next) {
+    async resetPassword(req, res, next) {
         /*
         алгоритм сброса пароля:
 
@@ -133,7 +145,20 @@ class UserController {
     async newPassword(req, res, next) {
         try {
             const { userId, token, password } = req.body;
-            const newPasswordData = await UserService.createNewPassword(userId, token, password);
+            const newPasswordData = await UserService.newPassword(userId, token, password);
+
+            res.json(newPasswordData);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async changePassword(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { password } = req.body;
+
+            const newPasswordData = await UserService.changePassword(id, password);
 
             res.json(newPasswordData);
         } catch (e) {

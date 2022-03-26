@@ -6,6 +6,7 @@ const express = require('express');
 
 const { Router } = express;
 
+const mainRoutes = require('./main');
 const authRoutes = require('./auth');
 const tasksRoutes = require('./tasks');
 const rolesRoutes = require('./roles');
@@ -20,6 +21,8 @@ const router = Router();
     1 параметр - префикс (путь)
     2 параметр - переменная с подключенным роутом
  */
+router.use('/', mainRoutes);
+
 router.use('/auth', authRoutes);
 router.use('/tasks', tasksRoutes);
 

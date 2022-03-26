@@ -14,7 +14,6 @@ const activationEmail = require('../emails/activation');
 const passwordEmail = require('../emails/password');
 const resetEmail = require('../emails/reset');
 const registerEmail = require('../emails/registration');
-const User = require('../models/user');
 
 /*
     создаём transporter для sendgrid
@@ -133,7 +132,7 @@ class UserService {
             throw ApiError.BadRequest(errors.array()[0].msg);
         }
 
-        const current = await User.findByIdAndUpdate(id, userData, { new: true });
+        const current = await UserModel.findByIdAndUpdate(id, userData, { new: true });
         return current;
     }
 
@@ -144,7 +143,7 @@ class UserService {
     async resetPassword(email) {
         crypto.randomBytes(32, async (err, buffer) => {
             const token = buffer.toString('hex');
-            const candidate = await User.findOne({ email });
+            const candidate = await UserModel.findOne({ email });
 
             if (!candidate) {
                 throw ApiError.BadRequest('Такого пользователя не существует');
@@ -159,8 +158,8 @@ class UserService {
         });
     }
 
-    async createNewPassword(userId, token, password) {
-        const user = await User.findOne({
+    async newPassword(userId, token, password) {
+        const user = await UserModel.findOne({
             _id: userId,
             'reset.token': token,
             'reset.expires': { $gt: Date.now() },
@@ -179,6 +178,14 @@ class UserService {
         return current;
     }
 
+    async changePassword(userId, password) {
+        const user = await this.getUserById(userId);
+        user.password = await bcrypt.hash(password, 10); // шифрование пароля
+
+        const current = await user.save(); // сохраняем пользователя
+        return current;
+    }
+
     async getAllUsers() {
         return UserModel.find();
     }
@@ -188,7 +195,17 @@ class UserService {
     }
 
     async getUserById(id) {
-        return UserModel.findById(id);
+        if (!isValidObjectId(id)) {
+            throw ApiError.BadRequest('Неправильный формат id');
+        }
+
+        const user = await UserModel.findById(id);
+
+        if (!user) {
+            throw ApiError.BadRequest('Пользователь не найден');
+        }
+
+        return user;
     }
 }
 
