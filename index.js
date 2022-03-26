@@ -69,7 +69,7 @@ app.use(cookieParser());
 app.use(
     cors({
         credentials: true,
-        origin: process.env.CLIENT_URL,
+        origin: keys.CLIENT_URL,
         optionsSuccessStatus: 200, // For legacy browser support
     }),
 );

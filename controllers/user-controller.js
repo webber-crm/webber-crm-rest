@@ -9,9 +9,9 @@ const ApiError = require('../exceptions/api-error');
 class UserController {
     async registration(req, res, next) {
         try {
-            const errors = validationResult(req);
+            const errors = validationResult(req.body);
             if (!errors.isEmpty()) {
-                return next(ApiError.BadRequest('Ошибка при валидации', errors.array()));
+                return next(ApiError.BadRequest(errors.array()[0].msg, errors.array()));
             }
             const { email, password } = req.body;
             const userData = await UserService.registration(email, password);
@@ -24,6 +24,10 @@ class UserController {
 
     async login(req, res, next) {
         try {
+            const errors = validationResult(req.body);
+            if (!errors.isEmpty()) {
+                return next(ApiError.BadRequest(errors.array()[0].msg, errors.array()));
+            }
             const { email, password } = req.body;
             const userData = await UserService.login(email, password);
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
