@@ -12,17 +12,13 @@ const compression = require('compression');
 const fileupload = require('express-fileupload');
 
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const keys = require('./config');
 
 const errorHandler = require('./middleware/error');
 const variables = require('./middleware/variables');
 
-const authRoutes = require('./routes/auth');
-const customersRoutes = require('./routes/customers');
-const tasksRoutes = require('./routes/tasks');
-const usersRoutes = require('./routes/users');
-const rolesRoutes = require('./routes/roles');
-const projectsRoutes = require('./routes/projects');
+const routes = require('./routes/index');
 
 const app = express();
 
@@ -69,9 +65,11 @@ app.use(fileupload());
  */
 app.use(bodyParser.json());
 
+app.use(cookieParser());
 app.use(
     cors({
-        origin: ['http://localhost:3000', 'http://localhost:8000', keys.BASE_URL],
+        credentials: true,
+        origin: process.env.CLIENT_URL,
         optionsSuccessStatus: 200, // For legacy browser support
     }),
 );
@@ -82,19 +80,7 @@ app.use(
  */
 app.use(variables);
 
-/*
-    регистрируем роуты app.use()
-    1 параметр - префикс (путь)
-    2 параметр - переменная с подключенным роутом
- */
-app.use('/auth', authRoutes);
-app.use('/tasks', tasksRoutes);
-
-app.use('/users/roles', rolesRoutes);
-app.use('/users', usersRoutes);
-
-app.use('/customers/projects', projectsRoutes);
-app.use('/customers', customersRoutes);
+app.use('/api/v1', routes);
 
 app.use(errorHandler);
 

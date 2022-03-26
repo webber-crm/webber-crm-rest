@@ -1,26 +1,24 @@
-// подключаем функциб проверки body из пакета express-validator
+// подключаем функцию проверки body из пакета express-validator
+
 const bcrypt = require('bcryptjs');
 const { body } = require('express-validator');
 
-const User = require('../models/users');
-const Role = require('../models/roles');
+const User = require('../models/user');
+const Role = require('../models/role');
 const Project = require('../models/projects');
 
 exports.registerValidators = [
-    body(['email', 'username'])
+    body(['email'])
         .isEmail()
         .withMessage('Введите корректный Email')
         .custom(async value => {
             try {
                 // ищем пользователя с полученным email
-                const user = await User.findOne({ $or: [{ email: value }, { username: value }] });
+                const user = await User.findOne({ email: value });
                 // если пользователь найден
 
                 if (user?.email === value) {
                     return Promise.reject(new Error('Такой email уже занят'));
-                }
-                if (user?.username === value) {
-                    return Promise.reject(new Error(`Имя пользователя "${value}" уже занято`));
                 }
 
                 return Promise.resolve();
@@ -51,12 +49,12 @@ exports.registerValidators = [
 ];
 
 exports.loginValidators = [
-    body('username')
-        .if(body('username').isEmail().withMessage('Введите корректный Email').normalizeEmail())
+    body('email')
+        .if(body('email').isEmail().withMessage('Введите корректный Email').normalizeEmail())
         .custom(async value => {
             try {
                 // ищем пользователя с полученным email
-                const user = await User.findOne({ $or: [{ email: value }, { username: value }] });
+                const user = await User.findOne({ email: value });
                 if (!user) {
                     // если пользователь НЕ найден
                     return Promise.reject('Такого пользователя не существует');
@@ -74,8 +72,8 @@ exports.loginValidators = [
         .custom(async (value, { req }) => {
             try {
                 // ищем пользователя с полученным email
-                const { username } = req.body;
-                const user = await User.findOne({ $or: [{ email: username }, { username }] });
+                const { email } = req.body;
+                const user = await User.findOne({ email });
 
                 if (user) {
                     const compare = await bcrypt.compare(value, user.password);

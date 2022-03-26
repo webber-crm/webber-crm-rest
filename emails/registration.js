@@ -12,7 +12,7 @@ module.exports = function (email, name) {
             <p>${name}, вы успешно создали аккаунт.</p>
             <p>Ваш E-mail в системе: ${email}</p>
             <hr />
-            <a href="${keys.BASE_URL}">Перейти в систему</a>
+            <a href="${keys.CLIENT_URL}">Перейти в систему</a>
         `,
     };
 };

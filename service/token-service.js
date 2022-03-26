@@ -1,15 +1,15 @@
 const jwt = require('jsonwebtoken');
 const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = require('../config');
-const Token = require('../models/tokens');
+const Token = require('../models/token');
 
 class TokenService {
     static generateTokens(payload) {
-        const access_token = jwt.sign(payload, JWT_ACCESS_SECRET, { expiresIn: '30m' });
-        const refresh_token = jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: '30d' });
+        const accessToken = jwt.sign(payload, JWT_ACCESS_SECRET, { expiresIn: '30m' });
+        const refreshToken = jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: '30d' });
 
         return {
-            access_token,
-            refresh_token,
+            accessToken,
+            refreshToken,
         };
     }
 
@@ -29,26 +29,26 @@ class TokenService {
         }
     }
 
-    static async saveTokens(userId, refresh_token) {
+    static async saveToken(userId, refreshToken) {
         const tokenData = await Token.findOne({ user: userId });
 
         if (tokenData) {
-            tokenData.refresh_token = refresh_token;
+            tokenData.refreshToken = refreshToken;
             return tokenData.save();
         }
 
         return Token.create({
             user: userId,
-            refresh_token,
+            refreshToken,
         });
     }
 
-    static async removeToken(refresh_token) {
-        return Token.deleteOne({ refresh_token });
+    static async removeToken(refreshToken) {
+        return Token.deleteOne({ refreshToken });
     }
 
-    static async findToken(refresh_token) {
-        return Token.findOne({ refresh_token });
+    static async findToken(refreshToken) {
+        return Token.findOne({ refreshToken });
     }
 }
 

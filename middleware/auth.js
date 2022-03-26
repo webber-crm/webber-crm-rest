@@ -1,24 +1,26 @@
-const TokenService = require('../utils/token-service');
+const ApiError = require('../exceptions/api-error');
+const TokenService = require('../service/token-service');
 
 module.exports = function (req, res, next) {
-    const authHeader = req.headers.authorization;
+    try {
+        const authorizationHeader = req.headers.authorization;
+        if (!authorizationHeader) {
+            return next(ApiError.UnauthorizedError());
+        }
 
-    if (!authHeader) {
-        return res.status(400).json({ msg: 'Отсутствует заголовок Authorization' });
+        const accessToken = authorizationHeader.split(' ')[1];
+        if (!accessToken) {
+            return next(ApiError.UnauthorizedError());
+        }
+
+        const userData = TokenService.validateAccessToken(accessToken);
+        if (!userData) {
+            return next(ApiError.UnauthorizedError());
+        }
+
+        req.user = userData;
+        next();
+    } catch (e) {
+        return next(ApiError.UnauthorizedError());
     }
-
-    const access_token = authHeader.split(' ')[1];
-
-    if (!access_token) {
-        return res.status(401).json({ msg: 'Требуется авторизация' });
-    }
-
-    const userData = TokenService.validateAccessToken(access_token);
-    if (!userData) {
-        return res.status(401).json({ msg: 'Требуется авторизация' });
-    }
-
-    req.user = userData;
-
-    next();
 };

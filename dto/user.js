@@ -3,13 +3,13 @@ module.exports = class UserDTO {
 
     email;
 
-    username;
+    is_active;
 
     constructor(model) {
-        const { id, email, username } = model;
+        const { id, email, is_active } = model;
 
         this.id = id;
         this.email = email;
-        this.username = username;
+        this.is_active = is_active;
     }
 };
