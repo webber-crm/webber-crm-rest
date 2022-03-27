@@ -3,10 +3,9 @@
  */
 
 const { validationResult } = require('express-validator');
-const { isValidObjectId } = require('mongoose');
 const UserService = require('../service/user-service');
 const ApiError = require('../exceptions/api-error');
-const User = require('../models/user');
+const { CLIENT_URL } = require('../config');
 
 class UserController {
     async registration(req, res, next) {
@@ -52,9 +51,9 @@ class UserController {
 
     async activate(req, res, next) {
         try {
-            const activationLink = req.params.link;
-            await UserService.activate(activationLink);
-            return res.redirect(process.env.CLIENT_URL);
+            const { link } = req.params;
+            await UserService.activate(link);
+            return res.redirect(CLIENT_URL);
         } catch (e) {
             next(e);
         }
@@ -74,6 +73,7 @@ class UserController {
     async getUser(req, res, next) {
         try {
             const { id } = req.params;
+            const user = await UserService.getUserById(id);
 
             res.json(user);
         } catch (e) {
@@ -144,8 +144,8 @@ class UserController {
 
     async newPassword(req, res, next) {
         try {
-            const { userId, token, password } = req.body;
-            const newPasswordData = await UserService.newPassword(userId, token, password);
+            const { token, password } = req.body;
+            const newPasswordData = await UserService.newPassword(token, password);
 
             res.json(newPasswordData);
         } catch (e) {

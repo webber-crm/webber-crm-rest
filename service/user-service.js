@@ -35,11 +35,13 @@ class UserService {
         if (candidate) {
             throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`);
         }
-        const hashPassword = await bcrypt.hash(password, 3);
+        const hashPassword = await bcrypt.hash(password, 10);
         const activationLink = uuid.v4(); // v34fa-asfasf-142saf-sa-asf
 
         const user = await UserModel.create({ email, password: hashPassword, activationLink });
-        await transporter.sendMail(activationEmail(email, `${keys.API_URL}/api/activate/${activationLink}`));
+        await transporter.sendMail(
+            activationEmail(email, `${keys.API_URL}${keys.PREFIX}/auth/activate/${activationLink}`),
+        );
 
         const userDTO = new UserDTO(user); // id, email, isActivated
         const tokens = TokenService.generateTokens({ ...userDTO });
@@ -53,7 +55,7 @@ class UserService {
         if (!user) {
             throw ApiError.BadRequest('Неккоректная ссылка активации');
         }
-        user.isActivated = true;
+        user.is_active = true;
         await user.save();
     }
 
@@ -158,9 +160,8 @@ class UserService {
         });
     }
 
-    async newPassword(userId, token, password) {
+    async newPassword(token, password) {
         const user = await UserModel.findOne({
-            _id: userId,
             'reset.token': token,
             'reset.expires': { $gt: Date.now() },
         });
@@ -168,6 +169,8 @@ class UserService {
         if (!user) {
             throw ApiError.BadRequest('Время жизни токена истекло');
         }
+
+        console.log(password);
 
         user.password = await bcrypt.hash(password, 10); // шифрование пароля
         user.reset = undefined; // очищаем данные токена

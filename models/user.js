@@ -18,7 +18,7 @@ const user = new Schema(
             last: String,
             middle: String,
         },
-        salary: Number,
+        activationLink: String,
         is_active: {
             type: Boolean,
             default: false,
@@ -29,11 +29,11 @@ const user = new Schema(
         },
         job: {
             type: Schema.Types.ObjectId,
-            ref: 'Jobs',
+            ref: 'Job',
         },
         role: {
             type: Schema.Types.ObjectId,
-            ref: 'Roles',
+            ref: 'Role',
         },
     },
     {
@@ -42,4 +42,4 @@ const user = new Schema(
     },
 );
 
-module.exports = model('Users', user);
+module.exports = model('User', user);

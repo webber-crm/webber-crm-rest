@@ -13,4 +13,4 @@ const role = new Schema({
     },
 });
 
-module.exports = model('Roles', role);
+module.exports = model('Role', role);

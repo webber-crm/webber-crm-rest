@@ -7,4 +7,4 @@ const job = new Schema({
     },
 });
 
-module.exports = model('Jobs', job);
+module.exports = model('Job', job);

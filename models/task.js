@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose'); // подключаем класс Schema и функцию model() из mongoose
 
-const tasks = new Schema(
+const task = new Schema(
     {
         name: {
             type: String,
@@ -56,4 +56,4 @@ const tasks = new Schema(
     },
 );
 
-module.exports = model('Tasks', tasks); // экспортируем модель, передаём схему tasks
+module.exports = model('Task', task); // экспортируем модель, передаём схему task

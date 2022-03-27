@@ -16,13 +16,13 @@ const cookieParser = require('cookie-parser');
 const keys = require('./config');
 
 const errorHandler = require('./middleware/error');
-const variables = require('./middleware/variables');
+// const variables = require('./middleware/variables');
 
 const routes = require('./routes/index');
 
 const app = express();
 
-const store = new MongoStore({ connection: 'sessions', uri: keys.MONGODB_URI });
+// const store = new MongoStore({ connection: 'sessions', uri: keys.MONGODB_URI });
 
 /*
     устанавливаем папку, в которой будут содержаться шаблоны html
@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 /*
     сессии express-session
  */
-app.use(session({ secret: keys.SESSION_SECRET, saveUninitialized: true, resave: false, store }));
+// app.use(session({ secret: keys.SESSION_SECRET, saveUninitialized: true, resave: false, store }));
 
 /*
     регистрируем Flash - обработка ошибок
@@ -78,7 +78,7 @@ app.use(
     регистрируем middleware,
     который добавляет переменную isAuth во все шаблоны через объект res
  */
-app.use(variables);
+// app.use(variables);
 
 app.use('/api/v1', routes);
 

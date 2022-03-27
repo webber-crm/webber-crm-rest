@@ -6,7 +6,8 @@ const express = require('express');
 
 const { Router } = express;
 
-const mainRoutes = require('./main');
+const resetRoutes = require('./reset');
+const dashboardRoutes = require('./dashboard');
 const authRoutes = require('./auth');
 const tasksRoutes = require('./tasks');
 const rolesRoutes = require('./roles');
@@ -21,9 +22,11 @@ const router = Router();
     1 параметр - префикс (путь)
     2 параметр - переменная с подключенным роутом
  */
-router.use('/', mainRoutes);
 
 router.use('/auth', authRoutes);
+router.use('/reset', resetRoutes);
+
+router.use('/dashboard', dashboardRoutes);
 router.use('/tasks', tasksRoutes);
 
 router.use('/users/roles', rolesRoutes);

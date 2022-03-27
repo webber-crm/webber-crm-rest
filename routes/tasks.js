@@ -2,7 +2,7 @@ const { Router } = require('express'); // аналог const express.Router = re
 const { validationResult } = require('express-validator');
 
 const { isValidObjectId } = require('mongoose');
-const Task = require('../models/tasks');
+const Task = require('../models/task');
 
 const router = Router();
 const auth = require('../middleware/auth');
