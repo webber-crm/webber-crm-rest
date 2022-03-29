@@ -14,7 +14,7 @@ router.get('/', auth, async (req, res) => {
     res.json(projects);
 });
 
-router.post('/', auth, projectsValidators, async (req, res) => {
+router.post('/', auth, async (req, res) => {
     const { body } = req;
 
     const errors = validationResult(req); // получаем ошибки валдации (если есть)
@@ -50,7 +50,7 @@ router.get('/:id', auth, async (req, res) => {
     res.json(project);
 });
 
-router.patch('/:id', auth, projectsValidators, async (req, res) => {
+router.patch('/:id', auth, async (req, res) => {
     const { id } = req.params;
 
     if (!isValidObjectId(id)) {

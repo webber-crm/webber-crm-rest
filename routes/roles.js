@@ -8,14 +8,12 @@ const router = Router();
 const auth = require('../middleware/auth');
 const restricted = require('../middleware/restricted');
 
-const { rolesValidators } = require('../utils/validators');
-
 router.get('/', auth, async (req, res) => {
     const roles = await Role.find();
     res.json(roles);
 });
 
-router.post('/', auth, restricted, rolesValidators, async (req, res) => {
+router.post('/', auth, restricted, async (req, res) => {
     const { body } = req;
 
     const errors = validationResult(req); // получаем ошибки валдации (если есть)
@@ -51,7 +49,7 @@ router.get('/:id', auth, restricted, async (req, res) => {
     res.json(role);
 });
 
-router.patch('/:id', auth, restricted, rolesValidators, async (req, res) => {
+router.patch('/:id', auth, restricted, async (req, res) => {
     const { id } = req.params;
 
     if (!isValidObjectId(id)) {

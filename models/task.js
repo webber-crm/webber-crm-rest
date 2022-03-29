@@ -2,13 +2,13 @@ const { Schema, model } = require('mongoose'); // подключаем клас�
 
 const task = new Schema(
     {
-        name: {
+        title: {
             type: String,
             required: true,
         },
-        text: String,
+        description: String,
         time: {
-            est: Number,
+            estimate: Number,
             fact: Number,
             calc: {
                 type: Number,
@@ -20,7 +20,7 @@ const task = new Schema(
                 type: Schema.Types.ObjectId,
                 ref: 'Users',
             },
-            dev: {
+            developer: {
                 type: Schema.Types.ObjectId,
                 ref: 'Users',
             },
@@ -32,10 +32,6 @@ const task = new Schema(
         is_active: {
             type: Boolean,
             default: true,
-        },
-        project: {
-            type: Schema.Types.ObjectId,
-            ref: 'Projects',
         },
         customer: {
             type: Schema.Types.ObjectId,

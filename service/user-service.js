@@ -98,12 +98,6 @@ class UserService {
     }
 
     async create(userData) {
-        const errors = validationResult(userData); // получаем ошибки валдации (если есть)
-        if (!errors.isEmpty()) {
-            // если переменная с ошибками не пуста
-            throw ApiError.BadRequest(errors.array()[0].msg);
-        }
-
         const { name, email, password } = userData;
 
         /*
@@ -128,17 +122,15 @@ class UserService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const errors = validationResult(userData); // получаем ошибки валдации (если есть)
-        if (!errors.isEmpty()) {
-            // если переменная с ошибками не пуста
-            throw ApiError.BadRequest(errors.array()[0].msg);
-        }
-
         const current = await UserModel.findByIdAndUpdate(id, userData, { new: true });
         return current;
     }
 
     async delete(id) {
+        if (!isValidObjectId(id)) {
+            throw ApiError.BadRequest('Неправильный формат id');
+        }
+
         return UserModel.findByIdAndDelete(id);
     }
 
@@ -169,8 +161,6 @@ class UserService {
         if (!user) {
             throw ApiError.BadRequest('Время жизни токена истекло');
         }
-
-        console.log(password);
 
         user.password = await bcrypt.hash(password, 10); // шифрование пароля
         user.reset = undefined; // очищаем данные токена

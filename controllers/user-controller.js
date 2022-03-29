@@ -10,7 +10,7 @@ const { CLIENT_URL } = require('../config');
 class UserController {
     async registration(req, res, next) {
         try {
-            const errors = validationResult(req.body);
+            const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return next(ApiError.BadRequest(errors.array()[0].msg, errors.array()));
             }
@@ -25,7 +25,7 @@ class UserController {
 
     async login(req, res, next) {
         try {
-            const errors = validationResult(req.body);
+            const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return next(ApiError.BadRequest(errors.array()[0].msg, errors.array()));
             }
@@ -92,6 +92,12 @@ class UserController {
 
     async create(req, res, next) {
         try {
+            const errors = validationResult(req); // получаем ошибки валдации (если есть)
+            if (!errors.isEmpty()) {
+                // если переменная с ошибками не пуста
+                throw ApiError.BadRequest(errors.array()[0].msg);
+            }
+
             const user = await UserService.create(req.body);
             res.status(201).json(user);
         } catch (e) {
@@ -103,6 +109,12 @@ class UserController {
         try {
             const { id } = req.params;
             const { body } = req;
+
+            const errors = validationResult(body); // получаем ошибки валидации (если есть)
+            if (!errors.isEmpty()) {
+                // если переменная с ошибками не пуста
+                throw ApiError.BadRequest(errors.array()[0].msg);
+            }
 
             const user = await UserService.edit(id, body);
             res.json(user);

@@ -15,7 +15,7 @@ const usersRoutes = require('./users');
 const projectsRoutes = require('./projects');
 const customersRoutes = require('./customers');
 
-const router = Router();
+const router = Router({ automatic405: true });
 
 /*
     регистрируем роуты router.use()

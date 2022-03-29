@@ -11,6 +11,6 @@ router.post('/', authMiddleware, UserController.create);
 router.get('/:id', authMiddleware, UserController.getUser);
 router.patch('/:id', authMiddleware, usersValidators, UserController.edit);
 router.patch('/:id/change-password', authMiddleware, UserController.changePassword);
-router.delete('/:id', UserController.delete);
+router.delete('/:id', authMiddleware, UserController.delete);
 
 module.exports = router;
