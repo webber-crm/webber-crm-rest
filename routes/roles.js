@@ -2,18 +2,18 @@ const { Router } = require('express'); // аналог const express.Router = re
 const { validationResult } = require('express-validator');
 
 const { isValidObjectId } = require('mongoose');
-const Role = require('../models/role');
+const Role = require('../models/directory/role');
 
 const router = Router();
 const auth = require('../middleware/auth');
-const restricted = require('../middleware/restricted');
+const { forbidden } = require('../middleware/variables');
 
 router.get('/', auth, async (req, res) => {
     const roles = await Role.find();
     res.json(roles);
 });
 
-router.post('/', auth, restricted, async (req, res) => {
+router.post('/', auth, forbidden, async (req, res) => {
     const { body } = req;
 
     const errors = validationResult(req); // получаем ошибки валдации (если есть)
@@ -33,7 +33,7 @@ router.post('/', auth, restricted, async (req, res) => {
     }
 });
 
-router.get('/:id', auth, restricted, async (req, res) => {
+router.get('/:id', auth, forbidden, async (req, res) => {
     const { id } = req.params;
 
     if (!isValidObjectId(id)) {
@@ -49,7 +49,7 @@ router.get('/:id', auth, restricted, async (req, res) => {
     res.json(role);
 });
 
-router.patch('/:id', auth, restricted, async (req, res) => {
+router.patch('/:id', auth, forbidden, async (req, res) => {
     const { id } = req.params;
 
     if (!isValidObjectId(id)) {
@@ -67,7 +67,7 @@ router.patch('/:id', auth, restricted, async (req, res) => {
     res.json(current);
 });
 
-router.delete('/:id', auth, restricted, async (req, res) => {
+router.delete('/:id', auth, forbidden, async (req, res) => {
     const { id } = req.params;
 
     if (!isValidObjectId(id)) {

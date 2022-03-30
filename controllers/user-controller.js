@@ -95,7 +95,7 @@ class UserController {
             const errors = validationResult(req); // получаем ошибки валдации (если есть)
             if (!errors.isEmpty()) {
                 // если переменная с ошибками не пуста
-                throw ApiError.BadRequest(errors.array()[0].msg);
+                return next(ApiError.BadRequest(errors.array()[0].msg));
             }
 
             const user = await UserService.create(req.body);
@@ -113,7 +113,7 @@ class UserController {
             const errors = validationResult(body); // получаем ошибки валидации (если есть)
             if (!errors.isEmpty()) {
                 // если переменная с ошибками не пуста
-                throw ApiError.BadRequest(errors.array()[0].msg);
+                return next(ApiError.BadRequest(errors.array()[0].msg));
             }
 
             const user = await UserService.edit(id, body);

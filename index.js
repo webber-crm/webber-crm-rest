@@ -1,11 +1,8 @@
 const express = require('express');
-// const session = require('express-session');
-// const MongoStore = require('connect-mongodb-session')(session);
 
 const path = require('path');
 
 const flash = require('connect-flash');
-const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const mongoose = require('mongoose');
 const compression = require('compression');
@@ -16,13 +13,10 @@ const cookieParser = require('cookie-parser');
 const keys = require('./config');
 
 const errorHandler = require('./middleware/error');
-// const variables = require('./middleware/variables');
 
 const routes = require('./routes/index');
 
 const app = express();
-
-// const store = new MongoStore({ connection: 'sessions', uri: keys.MONGODB_URI });
 
 /*
     устанавливаем папку, в которой будут содержаться шаблоны html
@@ -63,7 +57,7 @@ app.use(fileupload());
 /*
  middleware для обработки запросов в body
  */
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.use(cookieParser());
 app.use(
@@ -74,14 +68,7 @@ app.use(
     }),
 );
 
-/*
-    регистрируем middleware,
-    который добавляет переменную isAuth во все шаблоны через объект res
- */
-// app.use(variables);
-
 app.use('/api/v1', routes);
-
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000;

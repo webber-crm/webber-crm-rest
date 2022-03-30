@@ -1,44 +1,17 @@
 // подключаем функцию проверки body из пакета express-validator
 
-const bcrypt = require('bcryptjs');
 const { body } = require('express-validator');
 
 const User = require('../models/user');
 
 exports.registerValidators = [
-    body(['email'])
-        .isEmail()
-        .withMessage('Введите корректный Email')
-        .custom(async value => {
-            try {
-                // ищем пользователя с полученным email
-                const user = await User.findOne({ email: value });
-                // если пользователь найден
-
-                if (user?.email === value) {
-                    return Promise.reject(new Error('Такой email уже занят'));
-                }
-
-                return Promise.resolve();
-            } catch (e) {
-                console.log(e);
-            }
-        })
-        .normalizeEmail(), // санитайзер, нормализует Email
+    body(['email']).isEmail().withMessage('Введите корректный Email').normalizeEmail(), // санитайзер, нормализует Email
     body('password')
         .isLength({ min: 8, max: 32 })
         .withMessage('Пароль должен быть минимум 8 символов')
         .isAlphanumeric()
         .withMessage('Пароль может включать в себя буквы и цифры')
         .trim(), // санитайзер trim, удаляет пробелы по краям
-    body('confirm')
-        .custom((value, { req }) => {
-            if (value !== req.body.password) {
-                throw new Error('Пароли должны совпадать');
-            }
-            return true;
-        })
-        .trim(),
 
     /*
         валидируем имя
@@ -47,47 +20,8 @@ exports.registerValidators = [
 ];
 
 exports.loginValidators = [
-    body('email')
-        .if(body('email').isEmail().withMessage('Введите корректный Email').normalizeEmail())
-        .custom(async value => {
-            try {
-                // ищем пользователя с полученным email
-                const user = await User.findOne({ email: value });
-                if (!user) {
-                    // если пользователь НЕ найден
-                    return Promise.reject('Такого пользователя не существует');
-                }
-
-                return Promise.resolve();
-            } catch (e) {
-                console.log(e);
-            }
-        }),
-    body('password', 'Пароль должен быть минимум 8 символов')
-        .isLength({ min: 8, max: 32 })
-        .isAlphanumeric()
-        .trim() // санитайзер trim, удаляет пробелы по краям
-        .custom(async (value, { req }) => {
-            try {
-                // ищем пользователя с полученным email
-                const { email } = req.body;
-                const user = await User.findOne({ email });
-
-                if (user) {
-                    const compare = await bcrypt.compare(value, user.password);
-                    if (!compare) {
-                        // если пароль не верный
-                        return Promise.reject('Неверный пароль');
-                    }
-                } else {
-                    return Promise.reject('Пользователь с таким email не найден');
-                }
-
-                return Promise.resolve();
-            } catch (e) {
-                console.log(e);
-            }
-        }),
+    body('email').if(body('email').isEmail().withMessage('Введите корректный Email').normalizeEmail()),
+    body('password', 'Пароль должен быть минимум 8 символов').isLength({ min: 8, max: 32 }).isAlphanumeric().trim(), // санитайзер trim, удаляет пробелы по краям
 ];
 
 exports.taskValidators = [

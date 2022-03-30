@@ -1,18 +1,9 @@
-/*
-    создали middleware
-*/
+const ApiError = require('../exceptions/api-error');
 
-module.exports = function (req, res, next) {
-    /*
-        данный код добавляет в объект res переменную isAuth,
-        которая будет доступна в каждом шаблоне .hbs
-    */
-    res.locals.isAuth = req.session.isAuthorized;
-    res.locals.user = req.session.user;
+exports.forbidden = function () {
+    throw ApiError.Forbidden();
+};
 
-    /*
-        добавляем токен CSRF в объект ответа,
-        чтобы токен был доступен в каждом шаблоне .hbs
-     */
-    next();
+exports.notAllowed = function () {
+    throw ApiError.MethodNotAllowed();
 };

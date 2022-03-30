@@ -7,6 +7,7 @@ const UserController = require('../controllers/user-controller');
 const router = Router();
 
 router.post('/registration', registerValidators, UserController.registration);
+
 router.get('/activate/:link', UserController.activate);
 
 router.post('/login', loginValidators, UserController.login);

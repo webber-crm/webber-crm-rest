@@ -6,7 +6,7 @@ const TaskModel = require('../models/task');
 
 class PaginationService {
     async getPagination(Model, content, size) {
-        const total_elements = await Model.find().count();
+        const total_elements = await Model.find().countDocuments();
         const total_pages = total_elements < size ? 1 : Math.round(total_elements / size);
 
         return {
