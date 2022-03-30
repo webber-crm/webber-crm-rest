@@ -10,7 +10,7 @@ exports.registerValidators = [
         .isLength({ min: 8, max: 32 })
         .withMessage('Пароль должен быть минимум 8 символов')
         .isAlphanumeric()
-        .withMessage('Пароль может включать в себя буквы и цифры')
+        .withMessage('Пароль может включать в себя только буквы и цифры')
         .trim(), // санитайзер trim, удаляет пробелы по краям
 
     /*
@@ -30,7 +30,7 @@ exports.taskValidators = [
 ];
 
 exports.taskValidatorsEdit = [
-    body('title', 'Название и тело задачи должно быть длинее 3 символов').optional().isLength({ min: 3 }).trim(),
+    body('title', 'Название задачи должно быть длинее 3 символов').optional().isLength({ min: 3 }).trim(),
     body('role')
         .optional()
         .isLength({ min: 1 })

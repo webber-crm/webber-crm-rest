@@ -3,7 +3,6 @@
  */
 
 const { validationResult } = require('express-validator');
-const PaginationService = require('../service/pagination-service');
 const TaskService = require('../service/task-service');
 const ApiError = require('../exceptions/api-error');
 const TaskDTO = require('../dto/task');
@@ -27,6 +26,16 @@ class TaskController {
         }
     }
 
+    async getTask(req, res, next) {
+        try {
+            const { id } = req.params;
+            const task = await TaskService.getTaskById(id);
+            res.json({ ...new TaskDTO(task) });
+        } catch (e) {
+            next(e);
+        }
+    }
+
     async create(req, res, next) {
         try {
             const errors = validationResult(req); // получаем ошибки валдации (если есть)
@@ -39,16 +48,6 @@ class TaskController {
 
             const task = await TaskService.create(body);
             res.status(201).json(task);
-        } catch (e) {
-            next(e);
-        }
-    }
-
-    async getTask(req, res, next) {
-        try {
-            const { id } = req.params;
-            const task = await TaskService.getTaskById(id);
-            res.json({ ...new TaskDTO(task) });
         } catch (e) {
             next(e);
         }
