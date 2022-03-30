@@ -35,7 +35,7 @@ class TaskService {
             throw ApiError.NotFound('Задача не найдена');
         }
 
-        return task;
+        return new TaskDTO(task);
     }
 
     async create(taskData) {
@@ -45,7 +45,7 @@ class TaskService {
         task.status = statusByDefault.id;
 
         const current = await task.save(); // вызываем метод класса Task для сохранения в БД
-        return current;
+        return new TaskDTO(current);
     }
 
     async edit(id, taskData) {
@@ -59,7 +59,7 @@ class TaskService {
             throw ApiError.NotFound('Задача не найдена');
         }
 
-        return task;
+        return new TaskDTO(task);
     }
 
     async delete(id) {
