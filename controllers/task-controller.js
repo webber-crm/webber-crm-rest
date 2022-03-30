@@ -3,13 +3,24 @@
  */
 
 const { validationResult } = require('express-validator');
+const PaginationService = require('../service/pagination-service');
 const TaskService = require('../service/task-service');
 const ApiError = require('../exceptions/api-error');
+const TaskDTO = require('../dto/task');
 
 class TaskController {
     async getTasks(req, res, next) {
         try {
-            const tasks = await TaskService.getAllTasks();
+            const errors = validationResult(req); // получаем ошибки валдации (если есть)
+            if (!errors.isEmpty()) {
+                // если переменная с ошибками не пуста
+                throw ApiError.BadRequest(errors.array()[0].msg);
+            }
+
+            const { page, size, ordering } = req.query;
+
+            const tasks = await TaskService.getAllTasks(page, size, ordering);
+
             res.json(tasks);
         } catch (e) {
             next(e);
@@ -37,7 +48,7 @@ class TaskController {
         try {
             const { id } = req.params;
             const task = await TaskService.getTaskById(id);
-            res.json(task);
+            res.json({ ...new TaskDTO(task) });
         } catch (e) {
             next(e);
         }

@@ -1,4 +1,4 @@
-module.exports = class UserDTO {
+module.exports = class TaskDTO {
     id;
 
     title;

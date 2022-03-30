@@ -37,10 +37,7 @@ const task = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Customers',
         },
-        status: {
-            type: Schema.Types.ObjectId,
-            ref: 'Status',
-        },
+        status: String,
         comments: {
             type: [Schema.Types.ObjectId],
             ref: 'Comments',
