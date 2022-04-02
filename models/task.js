@@ -10,24 +10,7 @@ const task = new Schema(
         time: {
             estimate: Number,
             fact: Number,
-            calc: {
-                type: Number,
-                default: 0,
-            },
-        },
-        roles: {
-            creator: {
-                type: Schema.Types.ObjectId,
-                ref: 'Users',
-            },
-            developer: {
-                type: Schema.Types.ObjectId,
-                ref: 'Users',
-            },
-            observers: {
-                type: [Schema.Types.ObjectId],
-                ref: 'Users',
-            },
+            calc: Number,
         },
         is_active: {
             type: Boolean,
