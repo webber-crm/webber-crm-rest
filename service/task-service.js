@@ -29,7 +29,7 @@ class TaskService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const task = await TaskModel.findById(id);
+        const task = await TaskModel.findById(id).populate('status');
 
         if (!task) {
             throw ApiError.NotFound('Задача не найдена');

@@ -31,16 +31,6 @@ exports.taskValidators = [
 
 exports.taskValidatorsEdit = [
     body('title', 'Название задачи должно быть длинее 3 символов').optional().isLength({ min: 3 }).trim(),
-    body('role')
-        .optional()
-        .isLength({ min: 1 })
-        .withMessage('Произошла ошибка, попробуйте ещё раз')
-        .custom(value => {
-            if (value > 1) {
-                throw new Error('Произошла ошибка, попробуйте ещё раз');
-            }
-            return true;
-        }),
     body('estimate', 'Поле оценки задачи должно быть заполнено')
         .optional()
         .isLength({ min: 1 })
