@@ -10,16 +10,27 @@ const TaskDTO = require('../dto/task');
 const PaginationService = require('./pagination-service');
 
 class TaskService {
-    async getAllTasks(page = 0, size = 10, ordering = '-createdAt') {
-        const tasks = await TaskModel.find()
+    async getAllTasks(
+        page = 0,
+        size = 10,
+        ordering = '-createdAt',
+        filter = {
+            show_inactive: undefined,
+        },
+    ) {
+        const find = {
+            is_active: typeof filter.show_inactive !== 'undefined' ? filter.show_inactive === 'false' : true,
+        };
+
+        const tasks = await TaskModel.find(find)
             .populate('status')
-            .limit(page)
+            .limit(+page)
             .skip(size * page)
             .sort(ordering)
             .exec();
 
         const dto = tasks.map(task => new TaskDTO(task));
-        const pagination = await PaginationService.getPagination(TaskModel, dto, size);
+        const pagination = await PaginationService.getPagination(TaskModel, dto, size, find);
 
         return pagination;
     }
