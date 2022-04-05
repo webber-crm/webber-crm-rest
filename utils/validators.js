@@ -12,11 +12,6 @@ exports.registerValidators = [
         .isAlphanumeric()
         .withMessage('Пароль может включать в себя только буквы и цифры')
         .trim(), // санитайзер trim, удаляет пробелы по краям
-
-    /*
-        валидируем имя
-     */
-    body('name').isLength({ min: 3 }).withMessage('Имя должно включать минимум 3 символа').trim(),
 ];
 
 exports.loginValidators = [

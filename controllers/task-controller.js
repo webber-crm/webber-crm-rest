@@ -16,9 +16,9 @@ class TaskController {
                 throw ApiError.BadRequest(errors.array()[0].msg);
             }
 
-            const { page, size, ordering } = req.query;
+            const { page, size, ordering, ...filter } = req.query;
 
-            const tasks = await TaskService.getAllTasks(page, size, ordering);
+            const tasks = await TaskService.getAllTasks(page, size, ordering, filter);
 
             res.json(tasks);
         } catch (e) {
