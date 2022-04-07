@@ -11,6 +11,7 @@ const PaginationService = require('./pagination-service');
 
 class TaskService {
     async getAllTasks(
+        user,
         page = 0,
         size = 10,
         ordering = '-createdAt',
@@ -19,6 +20,7 @@ class TaskService {
         },
     ) {
         const find = {
+            author: user.id,
             is_active: typeof filter.show_inactive !== 'undefined' ? filter.show_inactive === 'false' : true,
         };
 

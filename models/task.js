@@ -7,14 +7,14 @@ const task = new Schema(
             required: true,
         },
         description: String,
-        time: {
-            estimate: Number,
-            fact: Number,
-            calc: Number,
-        },
         is_active: {
             type: Boolean,
             default: true,
+        },
+        author: {
+            type: Schema.Types.ObjectId,
+            ref: 'Users',
+            required: true,
         },
         customer: {
             type: Schema.Types.ObjectId,
@@ -23,6 +23,11 @@ const task = new Schema(
         status: {
             type: Schema.Types.ObjectId,
             ref: 'Status',
+        },
+        time: {
+            estimate: Number,
+            fact: Number,
+            calc: Number,
         },
         comments: {
             type: [Schema.Types.ObjectId],
