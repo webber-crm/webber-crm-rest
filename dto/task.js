@@ -5,26 +5,26 @@ module.exports = class TaskDTO {
 
     description;
 
-    time;
-
-    roles;
-
     is_active;
+
+    author;
 
     customer;
 
     status;
 
+    time;
+
     constructor(model) {
-        const { id, title, description, time, is_active, roles, customer, status } = model;
+        const { id, title, description, is_active, author, customer, status, time } = model;
 
         this.id = id;
         this.title = title;
         this.description = description;
-        this.time = time;
         this.is_active = is_active;
-        this.roles = roles;
+        this.author = author;
         this.customer = customer;
         this.status = status;
+        this.time = time;
     }
 };

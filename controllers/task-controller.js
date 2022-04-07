@@ -17,8 +17,9 @@ class TaskController {
             }
 
             const { page, size, ordering, ...filter } = req.query;
+            const { user } = req;
 
-            const tasks = await TaskService.getAllTasks(page, size, ordering, filter);
+            const tasks = await TaskService.getAllTasks(user, page, size, ordering, filter);
 
             res.json(tasks);
         } catch (e) {
