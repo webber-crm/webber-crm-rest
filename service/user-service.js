@@ -3,9 +3,9 @@ const uuid = require('uuid');
 const nodemailer = require('nodemailer');
 const sendgrid = require('nodemailer-sendgrid-transport');
 const crypto = require('crypto');
-const { validationResult } = require('express-validator');
 const { isValidObjectId } = require('mongoose');
 const UserModel = require('../models/user');
+const RoleModel = require('../models/role');
 const TokenService = require('./token-service');
 const UserDTO = require('../dto/user');
 const ApiError = require('../exceptions/api-error');
@@ -38,12 +38,16 @@ class UserService {
         const hashPassword = await bcrypt.hash(password, 10);
         const activationLink = uuid.v4(); // v34fa-asfasf-142saf-sa-asf
 
-        const user = await UserModel.create({ email, password: hashPassword, activationLink });
+        const roleByDefault = await RoleModel.findOne({ role: 'USER' });
+
+        const user = await UserModel.create({ email, password: hashPassword, role: roleByDefault._id, activationLink });
         await transporter.sendMail(
             activationEmail(email, `${keys.API_URL}${keys.PREFIX}/auth/activate/${activationLink}`),
         );
 
-        const userDTO = new UserDTO(user); // id, email, isActivated
+        const populated = await UserModel.findById(user.id).populate('role');
+
+        const userDTO = new UserDTO(populated); // id, email, is_active
         const tokens = TokenService.generateTokens({ ...userDTO });
         await TokenService.saveToken(userDTO.id, tokens.refreshToken);
 
@@ -56,11 +60,12 @@ class UserService {
             throw ApiError.BadRequest('Неккоректная ссылка активации');
         }
         user.is_active = true;
+        user.activationLink = undefined;
         await user.save();
     }
 
     async login(email, password) {
-        const user = await UserModel.findOne({ email });
+        const user = await UserModel.findOne({ email }).populate('role');
         if (!user) {
             throw ApiError.BadRequest('Пользователь с таким email не найден');
         }
@@ -105,7 +110,9 @@ class UserService {
          */
         const hashPassword = await bcrypt.hash(password, 10);
 
-        const user = new UserModel({ ...userData, password: hashPassword });
+        const roleByDefault = await RoleModel.findOne({ role: 'USER' });
+
+        const user = new UserModel({ ...userData, password: hashPassword, role: roleByDefault._id });
         const current = await user.save();
 
         /*
@@ -114,7 +121,7 @@ class UserService {
          */
         await transporter.sendMail(registerEmail(email, name.first));
 
-        return current;
+        return new UserDTO(current);
     }
 
     async edit(id, userData) {
@@ -123,7 +130,7 @@ class UserService {
         }
 
         const current = await UserModel.findByIdAndUpdate(id, userData, { new: true });
-        return current;
+        return new UserDTO(current);
     }
 
     async delete(id) {
@@ -148,7 +155,7 @@ class UserService {
             const current = await candidate.save();
 
             await transporter.sendMail(resetEmail(candidate.email, token));
-            return current;
+            return new UserDTO(current);
         });
     }
 
@@ -168,7 +175,7 @@ class UserService {
         const current = await user.save(); // сохраняем пользователя
         await transporter.sendMail(passwordEmail(user.email));
 
-        return current;
+        return new UserDTO(current);
     }
 
     async changePassword(userId, password) {
@@ -176,15 +183,15 @@ class UserService {
         user.password = await bcrypt.hash(password, 10); // шифрование пароля
 
         const current = await user.save(); // сохраняем пользователя
-        return current;
+        return new UserDTO(current);
     }
 
     async getAllUsers() {
-        return UserModel.find();
+        return UserModel.find().populate('role');
     }
 
     async getUser(field, value) {
-        return UserModel.findOne({ [field]: value });
+        return UserModel.findOne({ [field]: value }).populate('role');
     }
 
     async getUserById(id) {
@@ -192,7 +199,7 @@ class UserService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const user = await UserModel.findById(id);
+        const user = await UserModel.findById(id).populate('role');
 
         if (!user) {
             throw ApiError.BadRequest('Пользователь не найден');
