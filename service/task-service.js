@@ -10,18 +10,11 @@ const TaskDTO = require('../dto/task');
 const PaginationService = require('./pagination-service');
 
 class TaskService {
-    async getAllTasks(
-        user,
-        page = 0,
-        size = 10,
-        ordering = '-createdAt',
-        filter = {
-            show_inactive: undefined,
-        },
-    ) {
+    async getAllTasks(user, page = 0, size = 10, ordering = '-createdAt', filter = {}) {
         const find = {
+            ...filter,
             author: user.id,
-            is_active: typeof filter.show_inactive !== 'undefined' ? filter.show_inactive === 'false' : true,
+            is_archive: filter.is_archive === 'true',
         };
 
         const tasks = await TaskModel.find(find)
