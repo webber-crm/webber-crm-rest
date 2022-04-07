@@ -30,8 +30,9 @@ class TaskController {
     async getTask(req, res, next) {
         try {
             const { id } = req.params;
-            const task = await TaskService.getTaskById(id);
-            res.json({ ...new TaskDTO(task) });
+            const { user } = req;
+            const task = await TaskService.getTaskById(id, user);
+            res.json(new TaskDTO(task));
         } catch (e) {
             next(e);
         }
@@ -45,10 +46,10 @@ class TaskController {
                 throw ApiError.BadRequest(errors.array()[0].msg);
             }
 
-            const { body } = req;
+            const { body, user } = req;
 
-            const task = await TaskService.create(body);
-            res.status(201).json(task);
+            const task = await TaskService.create(body, user);
+            res.status(201).json(new TaskDTO(task));
         } catch (e) {
             next(e);
         }
@@ -63,10 +64,10 @@ class TaskController {
             }
 
             const { id } = req.params;
-            const { body } = req;
+            const { body, user } = req;
 
-            const task = await TaskService.edit(id, body);
-            res.json(task);
+            const task = await TaskService.edit(id, body, user);
+            res.json(new TaskDTO(task));
         } catch (e) {
             next(e);
         }
@@ -74,7 +75,7 @@ class TaskController {
 
     async delete(req, res, next) {
         try {
-            await TaskService.delete(req.params.id);
+            await TaskService.delete(req.params.id, req.user);
             res.status(204).json();
         } catch (e) {
             next(e);
