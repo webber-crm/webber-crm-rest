@@ -37,12 +37,12 @@ class TaskService {
         return pagination;
     }
 
-    async getTaskById(id) {
+    async getTaskById(id, user) {
         if (!isValidObjectId(id)) {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const task = await TaskModel.findById(id).populate('status');
+        const task = await TaskModel.findOne({ _id: id, author: user.id }).populate('status');
 
         if (!task) {
             throw ApiError.NotFound('Задача не найдена');
@@ -51,22 +51,21 @@ class TaskService {
         return new TaskDTO(task);
     }
 
-    async create(taskData) {
+    async create(taskData, user) {
         const statusByDefault = await StatusModel.findOne({ status: 'NEW' });
 
-        const task = new TaskModel(taskData);
-        task.status = statusByDefault.id;
+        const task = new TaskModel({ ...taskData, author: user.id, status: statusByDefault.id });
 
         const current = await task.save(); // вызываем метод класса Task для сохранения в БД
         return new TaskDTO(current);
     }
 
-    async edit(id, taskData) {
+    async edit(id, taskData, user) {
         if (!isValidObjectId(id)) {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const task = await TaskModel.findByIdAndUpdate(id, taskData, { new: true });
+        const task = await TaskModel.findOneAndUpdate({ _id: id, author: user.id }, taskData, { new: true });
 
         if (!task) {
             throw ApiError.NotFound('Задача не найдена');
@@ -75,12 +74,19 @@ class TaskService {
         return new TaskDTO(task);
     }
 
-    async delete(id) {
+    async delete(id, user) {
         if (!isValidObjectId(id)) {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        await TaskModel.findByIdAndRemove(id);
+        const task = await this.getTaskById(id, user);
+
+        if (task) {
+            await TaskModel.findOneAndRemove({
+                _id: id,
+                author: user.id,
+            });
+        }
     }
 }
 
