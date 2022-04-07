@@ -11,6 +11,10 @@ const task = new Schema(
             type: Boolean,
             default: true,
         },
+        is_archive: {
+            type: Boolean,
+            default: false,
+        },
         author: {
             type: Schema.Types.ObjectId,
             ref: 'Users',
