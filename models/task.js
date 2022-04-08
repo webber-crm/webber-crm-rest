@@ -28,11 +28,9 @@ const task = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Status',
         },
-        time: {
-            estimate: Number,
-            fact: Number,
-            calc: Number,
-        },
+        estimate: Number,
+        actually: Number,
+        deadline: String,
         comments: {
             type: [Schema.Types.ObjectId],
             ref: 'Comments',

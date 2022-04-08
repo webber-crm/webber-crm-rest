@@ -15,10 +15,10 @@ module.exports = class TaskDTO {
 
     status;
 
-    time;
+    deadline;
 
     constructor(model) {
-        const { id, title, description, is_active, is_archive, author, customer, status, time } = model;
+        const { id, title, description, is_active, is_archive, author, customer, status, deadline } = model;
 
         this.id = id;
         this.title = title;
@@ -28,6 +28,6 @@ module.exports = class TaskDTO {
         this.author = author;
         this.customer = customer;
         this.status = status;
-        this.time = time;
+        this.deadline = deadline;
     }
 };
