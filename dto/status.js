@@ -1,14 +1,14 @@
 module.exports = class StatusDTO {
-    id;
+    _id;
 
     status;
 
     status_name;
 
     constructor(model) {
-        const { id, status, status_name } = model;
+        const { _id, status, status_name } = model;
 
-        this.id = id;
+        this._id = _id;
         this.status = status;
         this.status_name = status_name;
     }

@@ -6,13 +6,21 @@ const { isValidObjectId } = require('mongoose');
 const ApiError = require('../../exceptions/api-error');
 const StatusDTO = require('../../dto/status');
 const StatusModel = require('../../models/directory/status');
+const PaginationService = require('../pagination-service');
 
 class StatusService {
-    async getAllStatuses() {
-        const statuses = await StatusModel.find();
+    async getAllStatuses(page = 0, size = 10, ordering = '-createdAt', filter = {}) {
+        const statuses = await StatusModel.find(filter)
+            .limit(+page)
+            .skip(size * page)
+            .sort(ordering)
+            .exec();
+
         const dto = statuses.map(status => new StatusDTO(status));
 
-        return dto;
+        const pagination = await PaginationService.getPagination(StatusModel, dto);
+
+        return pagination;
     }
 
     async getStatusById(id) {
