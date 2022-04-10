@@ -5,6 +5,7 @@
 const { isValidObjectId } = require('mongoose');
 const TaskModel = require('../models/task');
 const StatusModel = require('../models/directory/status');
+const CustomerModel = require('../models/customer');
 const ApiError = require('../exceptions/api-error');
 const TaskDTO = require('../dto/task');
 const PaginationService = require('./pagination-service');
@@ -19,6 +20,7 @@ class TaskService {
 
         const tasks = await TaskModel.find(find)
             .populate('status')
+            .populate('customer')
             .limit(+page)
             .skip(size * page)
             .sort(ordering)
@@ -35,7 +37,7 @@ class TaskService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const task = await TaskModel.findOne({ _id: id, author: user.id }).populate('status');
+        const task = await TaskModel.findOne({ _id: id, author: user.id }).populate('status').populate('customer');
 
         if (!task) {
             throw ApiError.NotFound('Задача не найдена');
@@ -47,7 +49,12 @@ class TaskService {
     async create(taskData, user) {
         const statusByDefault = await StatusModel.findOne({ status: 'NEW' });
 
-        const task = new TaskModel({ ...taskData, author: user.id, status: statusByDefault.id });
+        const customer = await CustomerModel.findOne({ user: user.id });
+
+        const price =
+            !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
+
+        const task = new TaskModel({ ...taskData, author: user.id, status: statusByDefault.id, price });
 
         const current = await task.save(); // вызываем метод класса Task для сохранения в БД
         return new TaskDTO(current);
@@ -58,7 +65,16 @@ class TaskService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const task = await TaskModel.findOneAndUpdate({ _id: id, author: user.id }, taskData, { new: true });
+        const customer = await CustomerModel.findOne({ user: user.id });
+
+        const price =
+            !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
+
+        const task = await TaskModel.findOneAndUpdate(
+            { _id: id, author: user.id },
+            { ...taskData, price },
+            { new: true },
+        );
 
         if (!task) {
             throw ApiError.NotFound('Задача не найдена');
