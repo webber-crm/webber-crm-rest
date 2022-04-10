@@ -17,12 +17,12 @@ const task = new Schema(
         },
         author: {
             type: Schema.Types.ObjectId,
-            ref: 'Users',
+            ref: 'User',
             required: true,
         },
         customer: {
             type: Schema.Types.ObjectId,
-            ref: 'Customers',
+            ref: 'Customer',
         },
         status: {
             type: Schema.Types.ObjectId,
