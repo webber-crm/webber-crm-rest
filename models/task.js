@@ -28,9 +28,11 @@ const task = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Status',
         },
+        deadline: String,
         estimate: Number,
         actually: Number,
-        deadline: String,
+        is_fixed_price: Boolean,
+        price: Number,
         comments: {
             type: [Schema.Types.ObjectId],
             ref: 'Comments',
