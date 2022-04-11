@@ -9,6 +9,8 @@ module.exports = class TaskDTO {
 
     is_archive;
 
+    is_done;
+
     author;
 
     customer;
@@ -32,6 +34,7 @@ module.exports = class TaskDTO {
             description,
             is_active,
             is_archive,
+            is_done,
             author,
             customer,
             status,
@@ -47,6 +50,7 @@ module.exports = class TaskDTO {
         this.description = description;
         this.is_active = is_active;
         this.is_archive = is_archive;
+        this.is_done = is_done;
         this.author = author;
         this.customer = customer;
         this.status = status;

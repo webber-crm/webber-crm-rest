@@ -16,6 +16,7 @@ class TaskService {
             ...filter,
             author: user.id,
             is_archive: filter.is_archive === 'true',
+            is_done: filter.is_done === 'true',
         };
 
         const tasks = await TaskModel.find(find)
@@ -54,7 +55,12 @@ class TaskService {
         const price =
             !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
 
-        const task = new TaskModel({ ...taskData, author: user.id, status: statusByDefault.id, price });
+        const task = new TaskModel({
+            ...taskData,
+            author: user.id,
+            status: statusByDefault.id,
+            price,
+        });
 
         const current = await task.save(); // вызываем метод класса Task для сохранения в БД
         return new TaskDTO(current);
@@ -65,14 +71,27 @@ class TaskService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
+        const prevTask = await this.getTaskById(id, user);
+
         const customer = await CustomerModel.findOne({ user: user.id });
 
         const price =
             !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
 
+        const statusFromDB = taskData.status ? await StatusModel.findById(taskData.status) : undefined;
+
+        const is_done =
+            (taskData.status && statusFromDB.status === 'DONE') ||
+            (!taskData.status && prevTask.status.status === 'DONE') ||
+            false;
+
         const task = await TaskModel.findOneAndUpdate(
             { _id: id, author: user.id },
-            { ...taskData, price },
+            {
+                ...taskData,
+                price,
+                is_done,
+            },
             { new: true },
         );
 

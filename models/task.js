@@ -15,6 +15,10 @@ const task = new Schema(
             type: Boolean,
             default: false,
         },
+        is_done: {
+            type: Boolean,
+            default: false,
+        },
         author: {
             type: Schema.Types.ObjectId,
             ref: 'User',
