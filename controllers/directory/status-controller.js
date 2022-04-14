@@ -20,7 +20,7 @@ class StatusController {
 
     async getAllStatuses(req, res, next) {
         try {
-            const { page, size, ordering, ...filter } = req.params;
+            const { page, size, ordering, ...filter } = req.query;
             const status = await StatusService.getAllStatuses(page, size, ordering, filter);
             return res.json(status);
         } catch (e) {
