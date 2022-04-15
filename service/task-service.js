@@ -71,19 +71,28 @@ class TaskService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const prevTask = await this.getTaskById(id, user);
+        // TODO: refactor
+
+        const previousTask = await this.getTaskById(id, user);
 
         const customer = await CustomerModel.findOne({ user: user.id });
 
         const price =
-            !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
+            !taskData.is_fixed_price && taskData.estimate
+                ? customer.price * taskData.estimate
+                : taskData.price ?? previousTask.price;
 
         const statusFromDB = taskData.status ? await StatusModel.findById(taskData.status) : undefined;
 
         const is_done =
+            taskData.is_done ||
             (taskData.status && statusFromDB.status === 'DONE') ||
-            (!taskData.status && prevTask.status.status === 'DONE') ||
+            (!taskData.status && previousTask.status.status === 'DONE') ||
             false;
+
+        const status = taskData.is_done
+            ? await StatusModel.findOne({ status: 'DONE' }).select('_id')
+            : taskData.status ?? previousTask.status;
 
         const task = await TaskModel.findOneAndUpdate(
             { _id: id, author: user.id },
@@ -91,6 +100,7 @@ class TaskService {
                 ...taskData,
                 price,
                 is_done,
+                status,
             },
             { new: true },
         );

@@ -1,5 +1,5 @@
 module.exports = class TaskDTO {
-    id;
+    _id;
 
     title;
 
@@ -29,7 +29,7 @@ module.exports = class TaskDTO {
 
     constructor(model) {
         const {
-            id,
+            _id,
             title,
             description,
             is_active,
@@ -45,7 +45,7 @@ module.exports = class TaskDTO {
             price,
         } = model;
 
-        this.id = id;
+        this._id = _id;
         this.title = title;
         this.description = description;
         this.is_active = is_active;
