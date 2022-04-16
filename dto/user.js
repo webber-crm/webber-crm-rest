@@ -1,5 +1,5 @@
 module.exports = class UserDTO {
-    id;
+    _id;
 
     email;
 
@@ -10,9 +10,9 @@ module.exports = class UserDTO {
     role;
 
     constructor(model) {
-        const { id, email, is_active, name, role } = model;
+        const { _id, email, is_active, name, role } = model;
 
-        this.id = id;
+        this._id = _id;
         this.email = email;
         this.is_active = is_active;
         this.name = name;

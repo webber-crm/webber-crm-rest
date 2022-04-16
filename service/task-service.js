@@ -14,7 +14,7 @@ class TaskService {
     async getAllTasks(user, page = 0, size = 10, ordering = '-createdAt', filter = {}) {
         const find = {
             ...filter,
-            author: user.id,
+            author: user._id,
             is_archive: filter.is_archive === 'true',
             is_done: filter.is_done === 'true',
         };
@@ -38,7 +38,7 @@ class TaskService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const task = await TaskModel.findOne({ _id: id, author: user.id }).populate('status').populate('customer');
+        const task = await TaskModel.findOne({ _id: id, author: user._id }).populate('status').populate('customer');
 
         if (!task) {
             throw ApiError.NotFound('Задача не найдена');
@@ -50,14 +50,14 @@ class TaskService {
     async create(taskData, user) {
         const statusByDefault = await StatusModel.findOne({ status: 'NEW' });
 
-        const customer = await CustomerModel.findOne({ user: user.id });
+        const customer = await CustomerModel.findOne({ user: user._id });
 
         const price =
             !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
 
         const task = new TaskModel({
             ...taskData,
-            author: user.id,
+            author: user._id,
             status: statusByDefault.id,
             price,
         });
@@ -75,7 +75,7 @@ class TaskService {
 
         const previousTask = await this.getTaskById(id, user);
 
-        const customer = await CustomerModel.findOne({ user: user.id });
+        const customer = await CustomerModel.findOne({ user: user._id });
 
         const price =
             !taskData.is_fixed_price && taskData.estimate
@@ -95,7 +95,7 @@ class TaskService {
             : taskData.status ?? previousTask.status;
 
         const task = await TaskModel.findOneAndUpdate(
-            { _id: id, author: user.id },
+            { _id: id, author: user._id },
             {
                 ...taskData,
                 price,
@@ -122,7 +122,7 @@ class TaskService {
         if (task) {
             await TaskModel.findOneAndRemove({
                 _id: id,
-                author: user.id,
+                author: user._id,
             });
         }
     }

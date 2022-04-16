@@ -45,7 +45,7 @@ class UserService {
             activationEmail(email, `${keys.API_URL}${keys.PREFIX}/auth/activate/${activationLink}`),
         );
 
-        const populated = await UserModel.findById(user.id).populate('role');
+        const populated = await UserModel.findById(user._id).populate('role');
 
         const userDTO = new UserDTO(populated); // id, email, is_active
         const tokens = TokenService.generateTokens({ ...userDTO });

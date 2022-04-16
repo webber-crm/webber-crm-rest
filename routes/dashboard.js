@@ -12,6 +12,6 @@ const DashboardController = require('../controllers/dashboard-controller');
 
 const authMiddleware = require('../middleware/auth');
 
-router.get('/cards', authMiddleware, DashboardController.getHomeCards);
+router.get('/tasks', authMiddleware, DashboardController.getHomeTasks);
 
 module.exports = router;
