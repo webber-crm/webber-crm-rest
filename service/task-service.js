@@ -50,7 +50,7 @@ class TaskService {
     async create(taskData, user) {
         const statusByDefault = await StatusModel.findOne({ status: 'NEW' });
 
-        const customer = await CustomerModel.findOne({ user: user._id });
+        const customer = await CustomerModel.findOne({ _id: taskData.customer, user: user._id });
 
         const price =
             !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;

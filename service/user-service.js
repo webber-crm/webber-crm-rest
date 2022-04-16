@@ -5,6 +5,7 @@ const sendgrid = require('nodemailer-sendgrid-transport');
 const crypto = require('crypto');
 const { isValidObjectId } = require('mongoose');
 const UserModel = require('../models/user');
+const CountModel = require('../models/count');
 const RoleModel = require('../models/role');
 const TokenService = require('./token-service');
 const UserDTO = require('../dto/user');
@@ -98,7 +99,7 @@ class UserService {
         const userDTO = new UserDTO(user);
         const tokens = TokenService.generateTokens({ ...userDTO });
 
-        await TokenService.saveToken(userDTO.id, tokens.refreshToken);
+        await TokenService.saveToken(userDTO._id, tokens.refreshToken);
         return { ...tokens, user: userDTO };
     }
 
@@ -138,6 +139,7 @@ class UserService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
+        await CountModel.findOneAndDelete({ user: id });
         return UserModel.findByIdAndDelete(id);
     }
 

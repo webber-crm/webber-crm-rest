@@ -27,6 +27,8 @@ module.exports = class TaskDTO {
 
     price;
 
+    num;
+
     constructor(model) {
         const {
             _id,
@@ -43,6 +45,7 @@ module.exports = class TaskDTO {
             actually,
             is_fixed_price,
             price,
+            num,
         } = model;
 
         this._id = _id;
@@ -59,5 +62,6 @@ module.exports = class TaskDTO {
         this.actually = actually;
         this.is_fixed_price = is_fixed_price;
         this.price = price;
+        this.num = num;
     }
 };
