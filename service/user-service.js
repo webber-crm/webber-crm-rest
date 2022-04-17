@@ -50,7 +50,7 @@ class UserService {
 
         const userDTO = new UserDTO(populated); // id, email, is_active
         const tokens = TokenService.generateTokens({ ...userDTO });
-        await TokenService.saveToken(userDTO.id, tokens.refreshToken);
+        await TokenService.saveToken(userDTO._id, tokens.refreshToken);
 
         return { ...tokens, user: userDTO };
     }
@@ -77,7 +77,7 @@ class UserService {
         const userDTO = new UserDTO(user);
         const tokens = TokenService.generateTokens({ ...userDTO });
 
-        await TokenService.saveToken(userDTO.id, tokens.refreshToken);
+        await TokenService.saveToken(userDTO._id, tokens.refreshToken);
         return { ...tokens, user: userDTO };
     }
 
@@ -95,7 +95,10 @@ class UserService {
         if (!userData || !tokenFromDb) {
             throw ApiError.UnauthorizedError();
         }
-        const user = await UserModel.findById(userData.id);
+        const user = await UserModel.findById(userData._id);
+
+        console.log(userData);
+
         const userDTO = new UserDTO(user);
         const tokens = TokenService.generateTokens({ ...userDTO });
 
