@@ -97,8 +97,6 @@ class UserService {
         }
         const user = await UserModel.findById(userData._id);
 
-        console.log(userData);
-
         const userDTO = new UserDTO(user);
         const tokens = TokenService.generateTokens({ ...userDTO });
 

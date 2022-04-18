@@ -10,6 +10,10 @@ const customer = new Schema(
             type: Boolean,
             default: true,
         },
+        is_archive: {
+            type: Boolean,
+            default: false,
+        },
         projects: [String],
         price: { type: Number },
         service: {

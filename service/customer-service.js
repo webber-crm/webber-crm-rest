@@ -13,6 +13,7 @@ class CustomerService {
         const find = {
             ...filter,
             user: user._id,
+            is_archive: filter.is_archive === 'true',
         };
 
         const customers = await CustomerModel.find(find)
