@@ -29,6 +29,7 @@ const task = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Customer',
         },
+        project: String,
         status: {
             type: Schema.Types.ObjectId,
             ref: 'Status',
