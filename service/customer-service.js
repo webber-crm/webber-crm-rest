@@ -7,6 +7,7 @@ const CustomerModel = require('../models/customer');
 const ApiError = require('../exceptions/api-error');
 const CustomerDTO = require('../dto/customer');
 const PaginationService = require('./pagination-service');
+const TaskService = require('./task-service');
 
 class CustomerService {
     async getAllCustomers(user, page = 0, size = 10, ordering = '-createdAt', filter = {}) {
@@ -70,6 +71,12 @@ class CustomerService {
         }
 
         const customer = await this.getCustomerById(id, user);
+
+        const tasks = await TaskService.getTasks(user, { customer: id });
+
+        if (tasks.length > 0) {
+            throw ApiError.BadRequest('Невозможно удалить клиента, для которого созданы задачи');
+        }
 
         if (customer) {
             await CustomerModel.findOneAndRemove({

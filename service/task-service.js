@@ -33,6 +33,20 @@ class TaskService {
         return pagination;
     }
 
+    async getTasks(user, filter = {}) {
+        if (!isValidObjectId(user._id)) {
+            throw ApiError.BadRequest('Не найден автор задачи');
+        }
+
+        const tasks = await TaskModel.find({ author: user._id, ...filter });
+
+        if (!tasks) {
+            throw ApiError.NotFound('Задача не найдена');
+        }
+
+        return tasks.map(task => new TaskDTO(task));
+    }
+
     async getTaskById(id, user) {
         if (!isValidObjectId(id)) {
             throw ApiError.BadRequest('Неправильный формат id');
