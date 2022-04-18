@@ -1,5 +1,5 @@
 module.exports = class TaskDTO {
-    id;
+    _id;
 
     title;
 
@@ -15,6 +15,8 @@ module.exports = class TaskDTO {
 
     customer;
 
+    project;
+
     status;
 
     deadline;
@@ -27,9 +29,11 @@ module.exports = class TaskDTO {
 
     price;
 
+    num;
+
     constructor(model) {
         const {
-            id,
+            _id,
             title,
             description,
             is_active,
@@ -37,15 +41,17 @@ module.exports = class TaskDTO {
             is_done,
             author,
             customer,
+            project,
             status,
             deadline,
             estimate,
             actually,
             is_fixed_price,
             price,
+            num,
         } = model;
 
-        this.id = id;
+        this._id = _id;
         this.title = title;
         this.description = description;
         this.is_active = is_active;
@@ -53,11 +59,13 @@ module.exports = class TaskDTO {
         this.is_done = is_done;
         this.author = author;
         this.customer = customer;
+        this.project = project;
         this.status = status;
         this.deadline = deadline;
         this.estimate = estimate;
         this.actually = actually;
         this.is_fixed_price = is_fixed_price;
         this.price = price;
+        this.num = num;
     }
 };

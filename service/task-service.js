@@ -14,7 +14,7 @@ class TaskService {
     async getAllTasks(user, page = 0, size = 10, ordering = '-createdAt', filter = {}) {
         const find = {
             ...filter,
-            author: user.id,
+            author: user._id,
             is_archive: filter.is_archive === 'true',
             is_done: filter.is_done === 'true',
         };
@@ -33,12 +33,26 @@ class TaskService {
         return pagination;
     }
 
+    async getTasks(user, filter = {}) {
+        if (!isValidObjectId(user._id)) {
+            throw ApiError.BadRequest('Не найден автор задачи');
+        }
+
+        const tasks = await TaskModel.find({ author: user._id, ...filter });
+
+        if (!tasks) {
+            throw ApiError.NotFound('Задача не найдена');
+        }
+
+        return tasks.map(task => new TaskDTO(task));
+    }
+
     async getTaskById(id, user) {
         if (!isValidObjectId(id)) {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const task = await TaskModel.findOne({ _id: id, author: user.id }).populate('status').populate('customer');
+        const task = await TaskModel.findOne({ _id: id, author: user._id }).populate('status').populate('customer');
 
         if (!task) {
             throw ApiError.NotFound('Задача не найдена');
@@ -50,14 +64,14 @@ class TaskService {
     async create(taskData, user) {
         const statusByDefault = await StatusModel.findOne({ status: 'NEW' });
 
-        const customer = await CustomerModel.findOne({ user: user.id });
+        const customer = await CustomerModel.findOne({ _id: taskData.customer, user: user._id });
 
         const price =
             !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
 
         const task = new TaskModel({
             ...taskData,
-            author: user.id,
+            author: user._id,
             status: statusByDefault.id,
             price,
         });
@@ -71,26 +85,36 @@ class TaskService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const prevTask = await this.getTaskById(id, user);
+        // TODO: refactor
 
-        const customer = await CustomerModel.findOne({ user: user.id });
+        const previousTask = await this.getTaskById(id, user);
+
+        const customer = await CustomerModel.findOne({ user: user._id });
 
         const price =
-            !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
+            !taskData.is_fixed_price && taskData.estimate
+                ? customer.price * taskData.estimate
+                : taskData.price ?? previousTask.price;
 
         const statusFromDB = taskData.status ? await StatusModel.findById(taskData.status) : undefined;
 
         const is_done =
+            taskData.is_done ||
             (taskData.status && statusFromDB.status === 'DONE') ||
-            (!taskData.status && prevTask.status.status === 'DONE') ||
+            (!taskData.status && previousTask.status.status === 'DONE') ||
             false;
 
+        const status = taskData.is_done
+            ? await StatusModel.findOne({ status: 'DONE' }).select('_id')
+            : taskData.status ?? previousTask.status;
+
         const task = await TaskModel.findOneAndUpdate(
-            { _id: id, author: user.id },
+            { _id: id, author: user._id },
             {
                 ...taskData,
                 price,
                 is_done,
+                status,
             },
             { new: true },
         );
@@ -112,7 +136,7 @@ class TaskService {
         if (task) {
             await TaskModel.findOneAndRemove({
                 _id: id,
-                author: user.id,
+                author: user._id,
             });
         }
     }

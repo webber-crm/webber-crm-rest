@@ -1,9 +1,11 @@
-module.exports = class TaskDTO {
+module.exports = class CustomerDTO {
     _id;
 
     name;
 
     is_active;
+
+    is_archive;
 
     user;
 
@@ -14,11 +16,12 @@ module.exports = class TaskDTO {
     price;
 
     constructor(model) {
-        const { _id, name, is_active, user, projects, service, price } = model;
+        const { _id, name, is_active, is_archive, user, projects, service, price } = model;
 
         this._id = _id;
         this.name = name;
         this.is_active = is_active;
+        this.is_archive = is_archive;
         this.user = user;
         this.projects = projects;
         this.service = service;

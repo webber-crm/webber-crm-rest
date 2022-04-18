@@ -7,12 +7,14 @@ const CustomerModel = require('../models/customer');
 const ApiError = require('../exceptions/api-error');
 const CustomerDTO = require('../dto/customer');
 const PaginationService = require('./pagination-service');
+const TaskService = require('./task-service');
 
 class CustomerService {
     async getAllCustomers(user, page = 0, size = 10, ordering = '-createdAt', filter = {}) {
         const find = {
             ...filter,
-            user: user.id,
+            user: user._id,
+            is_archive: filter.is_archive === 'true',
         };
 
         const customers = await CustomerModel.find(find)
@@ -33,7 +35,7 @@ class CustomerService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const customer = await CustomerModel.findOne({ _id: id, user: user.id }).populate('user').populate('service');
+        const customer = await CustomerModel.findOne({ _id: id, user: user._id }).populate('user').populate('service');
 
         if (!customer) {
             throw ApiError.NotFound('Клиент не найден');
@@ -43,7 +45,7 @@ class CustomerService {
     }
 
     async create(customerData, user) {
-        const customer = new CustomerModel({ ...customerData, user: user.id });
+        const customer = new CustomerModel({ ...customerData, user: user._id });
 
         const current = await customer.save(); // вызываем метод класса Customer для сохранения в БД
         return new CustomerDTO(current);
@@ -54,7 +56,7 @@ class CustomerService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const customer = await CustomerModel.findOneAndUpdate({ _id: id, user: user.id }, customerData, { new: true });
+        const customer = await CustomerModel.findOneAndUpdate({ _id: id, user: user._id }, customerData, { new: true });
 
         if (!customer) {
             throw ApiError.NotFound('Клиент не найден');
@@ -70,10 +72,16 @@ class CustomerService {
 
         const customer = await this.getCustomerById(id, user);
 
+        const tasks = await TaskService.getTasks(user, { customer: id });
+
+        if (tasks.length > 0) {
+            throw ApiError.BadRequest('Невозможно удалить клиента, для которого созданы задачи');
+        }
+
         if (customer) {
             await CustomerModel.findOneAndRemove({
                 _id: id,
-                user: user.id,
+                user: user._id,
             });
         }
     }
