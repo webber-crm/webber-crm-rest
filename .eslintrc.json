@@ -20,7 +20,7 @@
         "object-curly-newline": "off",
         "no-multiple-empty-lines": [2, {"max": 1}],
         "max-lines": [1, {"max": 300}],
-        "no-console": [0],
+        "no-console": [2],
         "no-empty": [2],
         "no-empty-pattern": [2],
         "no-redeclare": [1],
@@ -37,7 +37,12 @@
         "no-await-in-loop": [1],
         "no-async-promise-executor": [1],
         "arrow-parens": [0],
-        "class-methods-use-this": [0]
+        "class-methods-use-this": [0],
+        "no-unused-vars": [
+            2,
+            {"vars": "all", "args": "after-used", "ignoreRestSiblings": false, "argsIgnorePattern": "^_"}
+        ],
+        "camelcase": "off"
     },
     "settings": {
         "import/resolver": {

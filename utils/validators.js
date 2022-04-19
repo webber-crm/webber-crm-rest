@@ -2,8 +2,6 @@
 
 const { body } = require('express-validator');
 
-const User = require('../models/user');
-
 exports.registerValidators = [
     body(['email']).isEmail().withMessage('Введите корректный Email').normalizeEmail(), // санитайзер, нормализует Email
     body('password')
@@ -60,21 +58,5 @@ exports.customersValidatorsEdit = [
 
 exports.usersValidators = [
     body('firstname', 'Имя не должно быть пустым').isLength({ min: 1 }).trim(),
-    body('email')
-        .isEmail()
-        .withMessage('Введите корректный Email')
-        .custom(async (value, { req }) => {
-            try {
-                const { email } = req.session.user;
-                // ищем пользователя с полученным email
-                const candidate = await User.findOne({ email: value });
-                if (candidate && candidate.email !== email) {
-                    // если пользователь найден И этот пользователь не текущий
-                    return Promise.reject('Этот email уже занят');
-                }
-            } catch (e) {
-                console.log(e);
-            }
-        })
-        .normalizeEmail(), // санитайзер, нормализует Email
+    body('email').isEmail().withMessage('Введите корректный Email').normalizeEmail(), // санитайзер, нормализует Email
 ];
