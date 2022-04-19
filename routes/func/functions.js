@@ -90,18 +90,14 @@ const func = {
      */
     getFilteredSelectList(data, field) {
         if (Array.isArray(field)) {
-            return data.map(obj =>
-                field.includes(obj._id)
-                    ? { ...obj.toObject(), selected: true }
-                    : { ...obj.toObject(), selected: false },
-            );
+            return data.map(obj => (field.includes(obj._id)
+                ? { ...obj.toObject(), selected: true }
+                : { ...obj.toObject(), selected: false }));
         }
         return field
-            ? data.map(obj =>
-                  obj._id.toString() === field._id.toString()
-                      ? { ...obj.toObject(), selected: true }
-                      : { ...obj.toObject(), selected: false },
-              )
+            ? data.map(obj => (obj._id.toString() === field._id.toString()
+                ? { ...obj.toObject(), selected: true }
+                : { ...obj.toObject(), selected: false }))
             : data;
     },
 
@@ -118,11 +114,9 @@ const func = {
     async getFilteredSelectListFromDB(model, field) {
         const data = await model.find();
         return field
-            ? data.map(obj =>
-                  obj._id.toString() === field._id.toString()
-                      ? { ...obj.toObject(), selected: true }
-                      : { ...obj.toObject(), selected: false },
-              )
+            ? data.map(obj => (obj._id.toString() === field._id.toString()
+                ? { ...obj.toObject(), selected: true }
+                : { ...obj.toObject(), selected: false }))
             : data;
     },
 
@@ -137,9 +131,8 @@ const func = {
     async getFilteredArrayFromDB(model, field, check = null) {
         const data = await model.find();
         return data.filter(
-            item =>
-                item._id.toString() !== field._id.toString() &&
-                (check !== null ? check.includes(item._id.toString()) : true),
+            item => item._id.toString() !== field._id.toString()
+                && (check !== null ? check.includes(item._id.toString()) : true),
         );
     },
 };

@@ -91,9 +91,11 @@ async function start() {
 
         // app.listen() - аналог модуля HTTP, метод http.createServer()
         app.listen(PORT, () => {
+            // eslint-disable-next-line no-console
             console.log(`Server is running on port ${PORT}`);
         });
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.log(e);
     }
 }

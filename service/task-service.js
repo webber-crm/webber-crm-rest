@@ -66,8 +66,7 @@ class TaskService {
 
         const customer = await CustomerModel.findOne({ _id: taskData.customer, user: user._id });
 
-        const price =
-            !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
+        const price = !taskData.is_fixed_price && taskData.estimate ? customer.price * taskData.estimate : taskData.price;
 
         const task = new TaskModel({
             ...taskData,
@@ -91,18 +90,16 @@ class TaskService {
 
         const customer = await CustomerModel.findOne({ user: user._id });
 
-        const price =
-            !taskData.is_fixed_price && taskData.estimate
-                ? customer.price * taskData.estimate
-                : taskData.price ?? previousTask.price;
+        const price = !taskData.is_fixed_price && taskData.estimate
+            ? customer.price * taskData.estimate
+            : taskData.price ?? previousTask.price;
 
         const statusFromDB = taskData.status ? await StatusModel.findById(taskData.status) : undefined;
 
-        const is_done =
-            taskData.is_done ||
-            (taskData.status && statusFromDB.status === 'DONE') ||
-            (!taskData.status && previousTask.status.status === 'DONE') ||
-            false;
+        const is_done = taskData.is_done
+            || (taskData.status && statusFromDB.status === 'DONE')
+            || (!taskData.status && previousTask.status.status === 'DONE')
+            || false;
 
         const status = taskData.is_done
             ? await StatusModel.findOne({ status: 'DONE' }).select('_id')

@@ -7,8 +7,6 @@ const Project = require('../models/projects');
 const router = Router();
 const auth = require('../middleware/auth');
 
-const { projectsValidators } = require('../utils/validators');
-
 router.get('/', auth, async (req, res) => {
     const projects = await Project.find();
     res.json(projects);
