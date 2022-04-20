@@ -10,7 +10,7 @@ const PaginationService = require('./pagination-service');
 const TaskService = require('./task-service');
 
 class CustomerService {
-    async getAllCustomers(user, page = 0, size = 10, ordering = '-createdAt', filter = {}) {
+    async getAllCustomers(user, page = 0, size = 25, ordering = '-createdAt', filter = {}) {
         const find = {
             ...filter,
             user: user._id,
