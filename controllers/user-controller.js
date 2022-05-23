@@ -90,6 +90,32 @@ class UserController {
         }
     }
 
+    async getProfile(req, res, next) {
+        try {
+            const { user } = req;
+
+            if (!user) return null;
+
+            const profile = await UserService.getUserById(user._id);
+            return res.json(profile);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async editProfile(req, res, next) {
+        try {
+            const { user, body } = req;
+
+            if (!user) return null;
+
+            const profile = await UserService.edit(user._id, body);
+            return res.json(profile);
+        } catch (e) {
+            next(e);
+        }
+    }
+
     async create(req, res, next) {
         try {
             const errors = validationResult(req); // получаем ошибки валдации (если есть)

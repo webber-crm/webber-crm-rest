@@ -10,14 +10,12 @@ const user = new Schema(
             type: String,
             required: true,
         },
-        name: {
-            first: {
-                type: String,
-                default: 'Anonymous',
-            },
-            last: String,
-            middle: String,
+        first_name: {
+            type: String,
+            default: 'Anonymous',
         },
+        last_name: String,
+        middle_name: String,
         activationLink: String,
         is_active: {
             type: Boolean,
