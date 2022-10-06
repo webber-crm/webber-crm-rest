@@ -14,6 +14,7 @@ const rolesRoutes = require('./roles');
 const usersRoutes = require('./users');
 const projectsRoutes = require('./projects');
 const customersRoutes = require('./customers');
+const profileRoutes = require('./profile');
 
 const statusRoutes = require('./directory/status');
 
@@ -33,6 +34,8 @@ router.use('/tasks', tasksRoutes);
 
 router.use('/users/roles', rolesRoutes);
 router.use('/users', usersRoutes);
+
+router.use('/profile', profileRoutes);
 
 router.use('/customers/projects', projectsRoutes);
 router.use('/customers', customersRoutes);

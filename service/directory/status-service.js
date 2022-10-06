@@ -9,7 +9,7 @@ const StatusModel = require('../../models/directory/status');
 const PaginationService = require('../pagination-service');
 
 class StatusService {
-    async getAllStatuses(page = 0, size = 10, ordering = '-createdAt', filter = {}) {
+    async getAllStatuses(page = 0, size = 25, ordering = '-createdAt', filter = {}) {
         const statuses = await StatusModel.find(filter)
             .limit(+page)
             .skip(size * page)

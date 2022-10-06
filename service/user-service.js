@@ -105,7 +105,7 @@ class UserService {
     }
 
     async create(userData) {
-        const { name, email, password } = userData;
+        const { first_name, email, password } = userData;
 
         /*
             создаём хэш пароля
@@ -121,7 +121,7 @@ class UserService {
             отправляем письмо через метод sendMail() у transporter
             отправку письма рекомендуется делать после редиректов, чтобы не наблюдать задержек
          */
-        await transporter.sendMail(registerEmail(email, name.first));
+        await transporter.sendMail(registerEmail(email, first_name));
 
         return new UserDTO(current);
     }
@@ -131,7 +131,7 @@ class UserService {
             throw ApiError.BadRequest('Неправильный формат id');
         }
 
-        const current = await UserModel.findByIdAndUpdate(id, userData, { new: true });
+        const current = await UserModel.findByIdAndUpdate(id, userData, { new: true }).populate('role').populate('job');
         return new UserDTO(current);
     }
 

@@ -3,7 +3,7 @@
  */
 
 class PaginationService {
-    async getPagination(Model, content, size = 10, find = {}) {
+    async getPagination(Model, content, size = 25, find = {}) {
         const total_elements = await Model.find(find).countDocuments();
         const total_pages = total_elements < size ? 1 : Math.round(total_elements / size);
 
