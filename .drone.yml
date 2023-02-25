@@ -1,0 +1,85 @@
+kind: pipeline
+name: default
+type: docker
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: restore-cache
+    image: drillster/drone-volume-cache
+    settings:
+      restore: true
+      mount:
+        - .eslintcache
+        - ./node_modules
+    volumes:
+    - name: cache
+      path: /cache
+
+  - name: install
+    image: node:18.14.0-alpine
+    commands:
+      - npm i -g npm@9.5.1
+      - npm -v
+      - npm install --frozen-lockfile --unsafe-perm
+    depends_on:
+    - restore-cache
+
+  - name: lint
+    image: node:18.14.0-alpine
+    commands:
+      - npm i -g npm@9.5.1
+      - npm run lint
+    when:
+      branch:
+        exclude:
+        - develop
+        - master
+    depends_on:
+    - install
+
+  - name: rebuild-cache-lint
+    image: drillster/drone-volume-cache
+    settings:
+      rebuild: true
+      mount:
+        - .eslintcache
+    volumes:
+      - name: cache
+        path: /cache
+    when:
+      branch:
+        exclude:
+        - develop
+        - master
+    depends_on:
+    - lint
+
+  - name: publish
+    image: plugins/docker
+    settings:
+      repo: astakhovaskold/webber-crm-rest
+      target: webber-crm
+      auto_tag: false
+      auto_tag_suffix: ${DRONE_COMMIT_BRANCH//\//-}
+      force_tag: true
+      username:
+        from_secret: DOCKER_USERNAME
+      password:
+        from_secret: DOCKER_PASSWORD
+      tags:
+        - ${DRONE_COMMIT_BRANCH//\//-}
+    when:
+      branch:
+        include:
+        - develop
+        - master
+    depends_on:
+    - lint
+
+volumes:
+  - name: cache
+    host:
+      path: /tmp
