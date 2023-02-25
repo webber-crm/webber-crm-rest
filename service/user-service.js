@@ -10,7 +10,6 @@ const RoleModel = require('../models/role');
 const TokenService = require('./token-service');
 const UserDTO = require('../dto/user');
 const ApiError = require('../exceptions/api-error');
-const keys = require('../config');
 const activationEmail = require('../emails/activation');
 const passwordEmail = require('../emails/password');
 const resetEmail = require('../emails/reset');
@@ -25,7 +24,7 @@ const registerEmail = require('../emails/registration');
 const transporter = nodemailer.createTransport(
     sendgrid({
         auth: {
-            api_key: keys.SENDGRID_API_KEY, // передаём ключ API, полученный в Sendgrid
+            api_key: process.env.SENDGRID_API_KEY, // передаём ключ API, полученный в Sendgrid
         },
     }),
 );
@@ -43,7 +42,7 @@ class UserService {
 
         const user = await UserModel.create({ email, password: hashPassword, role: roleByDefault._id, activationLink });
         await transporter.sendMail(
-            activationEmail(email, `${keys.API_URL}${keys.PREFIX}/auth/activate/${activationLink}`),
+            activationEmail(email, `${process.env.API_URL}${process.env.PREFIX}/auth/activate/${activationLink}`),
         );
 
         const populated = await UserModel.findById(user._id).populate('role');

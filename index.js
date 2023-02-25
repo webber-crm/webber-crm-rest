@@ -10,7 +10,6 @@ const fileupload = require('express-fileupload');
 
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const keys = require('./config');
 
 const errorHandler = require('./middleware/error');
 
@@ -36,10 +35,12 @@ app.use(express.static(path.join(__dirname, 'assets')));
  */
 app.use(express.urlencoded({ extended: true }));
 
+require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
+
 /*
     сессии express-session
  */
-// app.use(session({ secret: keys.SESSION_SECRET, saveUninitialized: true, resave: false, store }));
+// app.use(session({ secret: process.env.SESSION_SECRET, saveUninitialized: true, resave: false, store }));
 
 /*
     регистрируем Flash - обработка ошибок
@@ -63,7 +64,7 @@ app.use(cookieParser());
 app.use(
     cors({
         credentials: true,
-        origin: keys.CLIENT_URL,
+        origin: process.env.CLIENT_URL,
         optionsSuccessStatus: 200, // For legacy browser support
     }),
 );
@@ -82,7 +83,7 @@ async function start() {
             1 параметр - url от MongoDB
             2 параметр - различные опции | useNewUrlParser: true, useUnifiedTopology: true - для лучшей совместимости
          */
-        await mongoose.connect(keys.MONGODB_URI, {
+        await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useFindAndModify: false,
