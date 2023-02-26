@@ -79,7 +79,7 @@ steps:
     depends_on:
     - lint
 
-  - name: telegram
+  - name: notification
     image: appleboy/drone-telegram
     settings:
       token:
